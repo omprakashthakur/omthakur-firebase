@@ -37,6 +37,7 @@ const navLinks = [
   { href: "/photography", label: "Photography" },
   { href: "/about", label: "About Me" },
   { href: "/contact", label: "Contact" },
+  { href: "/admin/dashboard", label: "Admin" },
 ];
 
 export default function Header() {
