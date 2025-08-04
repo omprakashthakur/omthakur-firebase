@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { useAuth } from "@/hooks/use-auth";
 
 const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -43,6 +44,7 @@ export default function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { user } = useAuth();
 
   const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
     <Link
@@ -57,7 +59,7 @@ export default function Header() {
     </Link>
   );
 
-  if (pathname.startsWith('/admin')) {
+  if (pathname.startsWith('/admin') || pathname === '/login') {
     return null;
   }
 
@@ -85,9 +87,11 @@ export default function Header() {
                       <Link href={item.href}>{item.label}</Link>
                     </DropdownMenuItem>
                   ))}
-                  <DropdownMenuItem asChild>
-                    <Link href="/admin/dashboard">Admin</Link>
-                  </DropdownMenuItem>
+                  {user &&
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin/dashboard">Admin</Link>
+                    </DropdownMenuItem>
+                  }
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
@@ -132,7 +136,7 @@ export default function Header() {
                                             {link.items?.map((item) => (
                                                 <NavLink key={item.label} href={item.href}>{item.label}</NavLink>
                                             ))}
-                                             <NavLink href="/admin/dashboard">Admin</NavLink>
+                                             {user && <NavLink href="/admin/dashboard">Admin</NavLink>}
                                             </div>
                                         </>
                                     ) : (
