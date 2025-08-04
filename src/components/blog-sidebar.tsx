@@ -26,11 +26,16 @@ const socialNetworks = [
 ];
 
 const categoryIcons = {
-    'Tech': <Code className="h-6 w-6 text-accent-foreground" />,
-    'Current Affairs': <Newspaper className="h-6 w-6 text-accent-foreground" />,
-    'Personal': <User className="h-6 w-6 text-accent-foreground" />
+    'Tech': <Code className="h-4 w-4 text-white" />,
+    'Current Affairs': <Newspaper className="h-4 w-4 text-white" />,
+    'Personal': <User className="h-4 w-4 text-white" />
 } as const;
 
+const categoryColors = {
+    'Tech': 'bg-pink-500',
+    'Current Affairs': 'bg-orange-500',
+    'Personal': 'bg-blue-500',
+} as const;
 
 export default function BlogSidebar({
   categories,
@@ -77,29 +82,19 @@ export default function BlogSidebar({
         </CardHeader>
         <CardContent className="space-y-4">
           {(categories as Array<keyof typeof categoryIcons>).map((category) => (
-             <Link href={`/blog?category=${category}`} key={category}>
-                <div className="relative overflow-hidden rounded-lg group cursor-pointer shadow-md hover:shadow-xl transition-all duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 dark:from-primary/10 dark:to-accent/10 group-hover:from-primary/30 group-hover:to-accent/30 transition-all duration-300" />
-                    <div className="p-4 flex items-center gap-4">
-                       <div className="p-3 rounded-lg bg-accent/80 dark:bg-accent/50">
+             <Link href={`/blog?category=${category}`} key={category} className="block relative h-24 rounded-lg overflow-hidden group shadow-md hover:shadow-xl transition-all duration-300">
+                <Image src="https://placehold.co/400x200.png" alt={category} layout="fill" objectFit="cover" className="group-hover:scale-110 transition-transform duration-500" data-ai-hint="landscape abstract" />
+                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors duration-300" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="flex items-center gap-3 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-4 py-2 rounded-lg">
+                       <div className={`p-2 rounded-md ${categoryColors[category]}`}>
                          {categoryIcons[category]}
                        </div>
-                       <span className="font-bold text-lg">{category}</span>
+                       <span className="font-bold text-lg text-foreground">{category}</span>
                     </div>
                 </div>
              </Link>
           ))}
-           <Link href="/blog">
-                <div className="relative overflow-hidden rounded-lg group cursor-pointer shadow-md hover:shadow-xl transition-all duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-muted/20 dark:from-secondary/10 dark:to-muted/10 group-hover:from-secondary/30 group-hover:to-muted/30 transition-all duration-300" />
-                     <div className="p-4 flex items-center gap-4">
-                        <div className="p-3 rounded-lg bg-muted/80 dark:bg-muted/50">
-                           <Newspaper className="h-6 w-6 text-muted-foreground" />
-                        </div>
-                        <span className="font-bold text-lg">All Categories</span>
-                    </div>
-                </div>
-             </Link>
         </CardContent>
       </Card>
 
