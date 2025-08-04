@@ -140,13 +140,13 @@ export default function Header() {
                                 </div>
                             ))}
                         </nav>
-                        <div className="mt-8 flex justify-center gap-6">
-                            <Link href="#" aria-label="YouTube"><SocialIcons.Youtube className="h-6 w-6 text-muted-foreground hover:text-primary" /></Link>
-                            <Link href="#" aria-label="Instagram"><SocialIcons.Instagram className="h-6 w-6 text-muted-foreground hover:text-primary" /></Link>
-                            <Link href="#" aria-label="LinkedIn"><SocialIcons.Linkedin className="h-6 w-6 text-muted-foreground hover:text-primary" /></Link>
-                            <Link href="#" aria-label="Facebook"><SocialIcons.Facebook className="h-6 w-6 text-muted-foreground hover:text-primary" /></Link>
-                            <Link href="#" aria-label="GitHub"><SocialIcons.Github className="h-6 w-6 text-muted-foreground hover:text-primary" /></Link>
-                             <Link href="#" aria-label="TikTok"><SocialIcons.TikTok className="h-6 w-6 text-muted-foreground hover:text-primary"/></Link>
+                        <div className="mt-8 flex justify-center gap-4">
+                            <Link href="#" aria-label="Facebook"><div className="w-8 h-8 rounded-md bg-[#4267B2] flex items-center justify-center"><SocialIcons.Facebook className="text-white h-5 w-5"/></div></Link>
+                            <Link href="#" aria-label="Instagram"><div className="w-8 h-8 rounded-md bg-[#C13584] flex items-center justify-center"><SocialIcons.Instagram className="text-white h-5 w-5"/></div></Link>
+                            <Link href="#" aria-label="LinkedIn"><div className="w-8 h-8 rounded-md bg-[#0077B5] flex items-center justify-center"><SocialIcons.Linkedin className="text-white h-5 w-5"/></div></Link>
+                            <Link href="#" aria-label="TikTok"><div className="w-8 h-8 rounded-md bg-black flex items-center justify-center"><SocialIcons.TikTok className="text-white h-5 w-5"/></div></Link>
+                            <Link href="#" aria-label="YouTube"><div className="w-8 h-8 rounded-md bg-[#FF0000] flex items-center justify-center"><SocialIcons.Youtube className="text-white h-5 w-5"/></div></Link>
+                            <Link href="#" aria-label="GitHub"><div className="w-8 h-8 rounded-md bg-[#333] flex items-center justify-center"><SocialIcons.Github className="text-white h-5 w-5"/></div></Link>
                         </div>
                     </div>
                 </SheetContent>

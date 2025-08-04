@@ -17,12 +17,12 @@ interface BlogSidebarProps {
 }
 
 const socialNetworks = [
-  { name: 'Instagram', icon: <SocialIcons.Instagram />, url: '#' },
-  { name: 'Twitter', icon: <SocialIcons.Twitter />, url: '#' },
-  { name: 'Facebook', icon: <SocialIcons.Facebook />, url: '#' },
-  { name: 'Youtube', icon: <SocialIcons.Youtube />, url: '#' },
-  { name: 'Pinterest', icon: <SocialIcons.Pinterest />, url: '#' },
-  { name: 'Linkedin', icon: <SocialIcons.Linkedin />, url: '#' },
+    { name: 'Instagram', icon: <SocialIcons.Instagram className="text-white" />, url: '#', color: 'bg-[#C13584]' },
+    { name: 'Twitter', icon: <SocialIcons.Twitter className="text-white" />, url: '#', color: 'bg-[#1DA1F2]' },
+    { name: 'Facebook', icon: <SocialIcons.Facebook className="text-white" />, url: '#', color: 'bg-[#4267B2]' },
+    { name: 'Youtube', icon: <SocialIcons.Youtube className="text-white" />, url: '#', color: 'bg-[#FF0000]' },
+    { name: 'Pinterest', icon: <SocialIcons.Pinterest className="text-white" />, url: '#', color: 'bg-[#E60023]' },
+    { name: 'Linkedin', icon: <SocialIcons.Linkedin className="text-white" />, url: '#', color: 'bg-[#0077B5]' },
 ];
 
 const categoryIcons = {
@@ -61,8 +61,8 @@ export default function BlogSidebar({
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-3">
           {socialNetworks.map((network) => (
-            <Link key={network.name} href={network.url} className="flex items-center gap-3 rounded-lg bg-secondary/70 p-3 transition-transform duration-300 hover:scale-105 hover:shadow-lg dark:bg-secondary/20">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/70">
+             <Link key={network.name} href={network.url} className="flex items-center gap-3 rounded-lg bg-secondary/70 p-3 transition-transform duration-300 hover:scale-105 hover:shadow-lg dark:bg-secondary/20">
+                <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${network.color}`}>
                   {network.icon}
                 </div>
                 <span className="font-semibold text-sm">{network.name}</span>
