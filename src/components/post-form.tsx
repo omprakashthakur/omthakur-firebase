@@ -22,11 +22,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { categories } from '@/lib/data';
 import type { BlogPost } from '@/lib/data';
-import { useState } from 'react';
-import { storage } from '@/lib/firebase';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { Progress } from './ui/progress';
-import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
@@ -45,8 +40,6 @@ export default function PostForm({ post }: PostFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const isEditing = !!post;
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -67,43 +60,6 @@ export default function PostForm({ post }: PostFormProps) {
       .replace(/[^\w\s-]/g, '')
       .replace(/[\s_-]+/g, '-')
       .replace(/^-+|-+$/g, '');
-
-  async function handleImageUpload(file: File): Promise<string> {
-    setIsUploading(true);
-    setUploadProgress(0);
-
-    const storageRef = ref(storage, `images/posts/${Date.now()}-${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    return new Promise((resolve, reject) => {
-      uploadTask.on('state_changed',
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(progress);
-        }, 
-        (error) => {
-          console.error("Upload failed", error);
-          toast({
-            variant: "destructive",
-            title: "Image Upload Failed",
-            description: "There was an error uploading your image. Please try again.",
-          });
-          setIsUploading(false);
-          reject(error);
-        }, 
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setIsUploading(false);
-            setUploadProgress(100);
-            toast({
-              title: "Image Upload Successful",
-            });
-            resolve(downloadURL);
-          });
-        }
-      );
-    });
-  }
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -181,43 +137,15 @@ export default function PostForm({ post }: PostFormProps) {
                 name="image"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Featured Image</FormLabel>
+                        <FormLabel>Featured Image URL</FormLabel>
                         <FormControl>
-                          <>
                             <Input 
-                              type="file" 
-                              accept="image/*"
-                              className="mb-2"
-                              onChange={async (e) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                    const url = await handleImageUpload(file);
-                                    field.onChange(url);
-                                }
-                              }}
+                              placeholder="https://example.com/your-image.png"
+                              {...field}
                             />
-                            {isUploading && (
-                               <div className="flex items-center gap-2">
-                                <Loader2 className="h-4 w-4 animate-spin"/> 
-                                <Progress value={uploadProgress} className="w-[60%]" />
-                                <span>{Math.round(uploadProgress)}%</span>
-                               </div>
-                            )}
-                            {field.value && (
-                                <div className="mt-4">
-                                    <p className="text-sm text-muted-foreground">Image URL:</p>
-                                    <Input
-                                        readOnly
-                                        value={field.value}
-                                        className="mt-1 bg-muted"
-                                    />
-                                    <img src={field.value} alt="Preview" className="mt-4 rounded-md max-h-64 object-cover" />
-                                </div>
-                            )}
-                          </>
                         </FormControl>
                         <FormDescription>
-                            Upload a featured image for your post. The URL will be automatically populated.
+                            You can upload your image to a free hosting service and paste the URL here.
                         </FormDescription>
                         <FormMessage />
                     </FormItem>
@@ -289,7 +217,7 @@ export default function PostForm({ post }: PostFormProps) {
                 )}
               />
              </div>
-            <Button type="submit" disabled={isUploading}>{isEditing ? 'Update Post' : 'Create Post'}</Button>
+            <Button type="submit">{isEditing ? 'Update Post' : 'Create Post'}</Button>
           </form>
         </Form>
       </CardContent>
