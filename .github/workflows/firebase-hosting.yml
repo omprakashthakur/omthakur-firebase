@@ -1,0 +1,39 @@
+# This file is a template, and might need editing to fit your project.
+#
+# This workflow is triggered on pushes to the repository. It builds the
+# Next.js app and deploys it to Firebase Hosting.
+#
+# To use this workflow, you need to:
+#
+# 1.  Create a new GitHub repository for your project.
+# 2.  Push this code to your new repository.
+# 3.  Create a Firebase service account and download the JSON key file.
+#     - Go to your Firebase project settings > Service accounts.
+#     - Click "Generate new private key".
+# 4.  In your GitHub repository, go to Settings > Secrets and variables > Actions.
+# 5.  Create a new secret named `FIREBASE_SERVICE_ACCOUNT_OMTHAKURIO`.
+# 6.  Paste the entire content of the downloaded JSON key file as the value for the secret.
+# 7.  In your GitHub repository, go to Settings > Secrets and variables > Actions.
+# 8.  Create a new secret named `GCP_PROJECT_ID`.
+# 9.  Use your project ID as the value for the secret.
+
+name: Deploy to Firebase Hosting
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install
+      - run: npm run build
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_OMTHAKURIO }}'
+          projectId: '${{ secrets.GCP_PROJECT_ID }}'
+          channelId: live
