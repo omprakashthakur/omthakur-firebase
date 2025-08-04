@@ -20,19 +20,29 @@ export async function PUT(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const updatedPostData: Partial<BlogPost> = await request.json();
+    const updatedPostData: Partial<Omit<BlogPost, 'slug'>> = await request.json();
     const postIndex = blogPosts.findIndex(p => p.slug === params.slug);
 
     if (postIndex === -1) {
       return NextResponse.json({ message: 'Post not found' }, { status: 404 });
     }
 
-    const updatedPost = { ...blogPosts[postIndex], ...updatedPostData };
+    // Merge new data with existing data
+    const updatedPost = { 
+      ...blogPosts[postIndex], 
+      ...updatedPostData,
+      // Ensure tags are always an array
+      tags: Array.isArray(updatedPostData.tags) ? updatedPostData.tags : blogPosts[postIndex].tags,
+    };
     blogPosts[postIndex] = updatedPost;
 
     return NextResponse.json(updatedPost);
   } catch (error) {
-    return NextResponse.json({ message: 'Error updating post', error }, { status: 500 });
+    let errorMessage = 'Error updating post';
+    if (error instanceof Error) {
+        errorMessage = error.message;
+    }
+    return NextResponse.json({ message: errorMessage }, { status: 500 });
   }
 }
 
