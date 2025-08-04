@@ -1,3 +1,4 @@
+
 export interface BlogPost {
   slug: string;
   title: string;
@@ -11,6 +12,7 @@ export interface BlogPost {
 }
 
 export interface Vlog {
+  id: number;
   title: string;
   thumbnail: string;
   platform: 'YouTube' | 'Instagram' | 'TikTok';
@@ -19,6 +21,7 @@ export interface Vlog {
 }
 
 export interface Photography {
+  id: number;
   src: string;
   alt: string;
   downloadUrl: string;
@@ -97,6 +100,7 @@ function Counter() {
 
 export const vlogs: Vlog[] = [
   {
+    id: 1,
     title: 'Exploring the Streets of Tokyo',
     thumbnail: 'https://placehold.co/600x400.png',
     platform: 'YouTube',
@@ -104,6 +108,7 @@ export const vlogs: Vlog[] = [
     category: 'Travel',
   },
   {
+    id: 2,
     title: 'My Desk Setup for Productivity',
     thumbnail: 'https://placehold.co/600x400.png',
     platform: 'Instagram',
@@ -111,6 +116,7 @@ export const vlogs: Vlog[] = [
     category: 'Tech Talks',
   },
   {
+    id: 3,
     title: 'A Day in My Life as a Developer',
     thumbnail: 'https://placehold.co/600x400.png',
     platform: 'TikTok',
@@ -118,6 +124,7 @@ export const vlogs: Vlog[] = [
     category: 'Daily Life',
   },
   {
+    id: 4,
     title: 'Hiking in the Swiss Alps',
     thumbnail: 'https://placehold.co/600x400.png',
     platform: 'YouTube',
@@ -128,41 +135,49 @@ export const vlogs: Vlog[] = [
 
 export const photography: Photography[] = [
   {
+    id: 1,
     src: 'https://placehold.co/600x600.png',
     alt: 'Mountain landscape',
     downloadUrl: '#',
   },
   {
+    id: 2,
     src: 'https://placehold.co/600x600.png',
     alt: 'City skyline at night',
     downloadUrl: '#',
   },
   {
+    id: 3,
     src: 'https://placehold.co/600x600.png',
     alt: 'Forest path in autumn',
     downloadUrl: '#',
   },
   {
+    id: 4,
     src: 'https://placehold.co/600x600.png',
     alt: 'Coastal sunset',
     downloadUrl: '#',
   },
   {
+    id: 5,
     src: 'https://placehold.co/600x600.png',
     alt: 'Wildlife photography',
     downloadUrl: '#',
   },
   {
+    id: 6,
     src: 'https://placehold.co/600x600.png',
     alt: 'Abstract architecture',
     downloadUrl: '#',
   },
   {
+    id: 7,
     src: 'https://placehold.co/600x600.png',
     alt: 'Northern Lights',
     downloadUrl: '#',
   },
     {
+    id: 8,
     src: 'https://placehold.co/600x600.png',
     alt: 'Desert Dunes',
     downloadUrl: '#',
@@ -170,4 +185,6 @@ export const photography: Photography[] = [
 ];
 
 export const categories = ['Tech', 'Current Affairs', 'Personal'];
+export const vlogCategories: Vlog['category'][] = ['Travel', 'Tech Talks', 'Daily Life'];
+export const vlogPlatforms: Vlog['platform'][] = ['YouTube', 'Instagram', 'TikTok'];
 export const allTags = Array.from(new Set(blogPosts.flatMap(p => p.tags)));

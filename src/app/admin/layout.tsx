@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Newspaper, BarChart2 } from 'lucide-react';
+import { Home, Newspaper, BarChart2, Video } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -26,6 +26,7 @@ export default function AdminLayout({
 
   const menuItems = [
     { href: '/admin/dashboard', label: 'Posts', icon: Newspaper },
+    { href: '/admin/vlogs', label: 'Vlogs', icon: Video },
     { href: '/admin/analytics', label: 'Analytics', icon: BarChart2 },
   ];
 
@@ -49,7 +50,7 @@ export default function AdminLayout({
               <SidebarMenuItem key={item.label}>
                 <SidebarMenuButton
                   asChild
-                  isActive={pathname === item.href}
+                  isActive={pathname.startsWith(item.href)}
                   tooltip={{
                     children: item.label,
                   }}
