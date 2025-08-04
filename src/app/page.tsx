@@ -1,6 +1,4 @@
 
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, PlayCircle } from "lucide-react";
@@ -15,18 +13,35 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { useEffect, useState } from "react";
+import { collection, getDocs, limit, query } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
-export default function Home() {
-  const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
-  const [featuredVlogs, setFeaturedVlogs] = useState<Vlog[]>([]);
-  const [photoGallery, setPhotoGallery] = useState<Photography[]>([]);
+async function getRecentPosts() {
+    const postsCollection = collection(db, 'posts');
+    const q = query(postsCollection, limit(3));
+    const postsSnapshot = await getDocs(q);
+    return postsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[];
+}
 
-  useEffect(() => {
-    fetch('/api/posts').then(res => res.json()).then(data => setRecentPosts(data.slice(0, 3)));
-    fetch('/api/vlogs').then(res => res.json()).then(data => setFeaturedVlogs(data.slice(0, 3)));
-    fetch('/api/photography').then(res => res.json()).then(data => setPhotoGallery(data.slice(0, 6)));
-  }, []);
+async function getFeaturedVlogs() {
+    const vlogsCollection = collection(db, 'vlogs');
+    const q = query(vlogsCollection, limit(3));
+    const vlogsSnapshot = await getDocs(q);
+    return vlogsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Vlog[];
+}
+
+async function getPhotoGallery() {
+    const photosCollection = collection(db, 'photography');
+    const q = query(photosCollection, limit(6));
+    const photosSnapshot = await getDocs(q);
+    return photosSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Photography[];
+}
+
+
+export default async function Home() {
+  const recentPosts = await getRecentPosts();
+  const featuredVlogs = await getFeaturedVlogs();
+  const photoGallery = await getPhotoGallery();
 
   return (
     <div className="flex flex-col">

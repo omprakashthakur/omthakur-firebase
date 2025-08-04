@@ -1,7 +1,5 @@
 
-"use client"
-
-import { notFound, useParams } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import type { BlogPost } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
@@ -11,43 +9,43 @@ import Link from 'next/link';
 import BlogSidebar from '@/components/blog-sidebar';
 import ShareButtons from '@/components/share-buttons';
 import CommentSection from '@/components/comment-section';
-import { useEffect, useState } from 'react';
 import { categories as allCategories, allTags as allPostTags } from '@/lib/data';
+import { collection, getDocs, doc, getDoc, query, where, limit } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
-export default function BlogPostPage() {
-  const params = useParams();
-  const slug = params.slug as string;
-  const [post, setPost] = useState<BlogPost | null>(null);
-  const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
+async function getPost(slug: string): Promise<BlogPost | null> {
+    const postsCollection = collection(db, 'posts');
+    const q = query(postsCollection, where("slug", "==", slug));
+    const querySnapshot = await getDocs(q);
 
-  useEffect(() => {
-    if (slug) {
-      fetch(`/api/posts/${slug}`)
-        .then(res => res.json())
-        .then(data => {
-          if(data.message) {
-            notFound();
-          } else {
-            setPost(data)
-          }
-        })
-        .finally(() => setLoading(false));
-      
-      fetch('/api/posts')
-        .then(res => res.json())
-        .then(data => setRecentPosts(data.filter((p: BlogPost) => p.slug !== slug).slice(0, 5)));
-
+    if (querySnapshot.empty) {
+        return null;
     }
-  }, [slug]);
+    const postDoc = querySnapshot.docs[0];
+    return { ...postDoc.data(), id: postDoc.id } as BlogPost;
+}
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-  
+async function getRecentPosts(currentSlug: string) {
+    const postsCollection = collection(db, 'posts');
+    const q = query(
+        postsCollection,
+        where("slug", "!=", currentSlug),
+        limit(5)
+    );
+    const postsSnapshot = await getDocs(q);
+    return postsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[];
+}
+
+
+export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+  const slug = params.slug;
+  const post = await getPost(slug);
+
   if (!post) {
-    return notFound();
+    notFound();
   }
+
+  const recentPosts = await getRecentPosts(slug);
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -75,6 +73,7 @@ export default function BlogPostPage() {
             height={600}
             className="w-full h-auto rounded-lg shadow-lg mb-8"
             data-ai-hint="technology blog"
+            priority
           />
 
           <div className="prose dark:prose-invert max-w-none text-foreground/80" dangerouslySetInnerHTML={{ __html: post.content }} />

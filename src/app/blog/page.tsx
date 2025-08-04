@@ -1,40 +1,42 @@
 
-"use client";
-
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Calendar, User } from 'lucide-react';
 import type { BlogPost } from '@/lib/data';
 import BlogSidebar from '@/components/blog-sidebar';
-import { useEffect, useState } from 'react';
+import { collection, getDocs, query, where, limit } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { categories, allTags } from '@/lib/data';
 
 const POSTS_PER_PAGE = 6;
 
-export default function BlogPage() {
-  const searchParams = useSearchParams();
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [allTags, setAllTags] = useState<string[]>([]);
-  
-  useEffect(() => {
-    fetch('/api/posts')
-      .then(res => res.json())
-      .then(data => {
-        setPosts(data);
-        const uniqueCategories = Array.from(new Set(data.map((p: BlogPost) => p.category)));
-        const uniqueTags = Array.from(new Set(data.flatMap((p: BlogPost) => p.tags)));
-        setCategories(uniqueCategories as string[]);
-        setAllTags(uniqueTags as string[]);
-      });
-  }, []);
+async function getPosts() {
+    const postsCollection = collection(db, 'posts');
+    const postsSnapshot = await getDocs(postsCollection);
+    return postsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[];
+}
 
-  const currentPage = Number(searchParams.get('page')) || 1;
-  const selectedCategory = searchParams.get('category');
-  const selectedTag = searchParams.get('tag');
+async function getRecentPosts() {
+    const postsCollection = collection(db, 'posts');
+    const q = query(postsCollection, limit(5));
+    const postsSnapshot = await getDocs(q);
+    return postsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[];
+}
+
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const posts = await getPosts();
+  const recentPosts = await getRecentPosts();
+
+  const currentPage = Number(searchParams['page']) || 1;
+  const selectedCategory = searchParams['category'] as string | undefined;
+  const selectedTag = searchParams['tag'] as string | undefined;
 
   const filteredPosts = posts
     .filter(post => !selectedCategory || post.category === selectedCategory)
@@ -45,8 +47,6 @@ export default function BlogPage() {
     (currentPage - 1) * POSTS_PER_PAGE,
     currentPage * POSTS_PER_PAGE
   );
-
-  const recentPosts = posts.slice(0, 5);
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -119,8 +119,8 @@ export default function BlogPage() {
             categories={categories}
             tags={allTags}
             recentPosts={recentPosts}
-            currentCategory={selectedCategory || undefined}
-            currentTag={selectedTag || undefined}
+            currentCategory={selectedCategory}
+            currentTag={selectedTag}
           />
         </aside>
       </div>

@@ -10,11 +10,17 @@ import { Button } from '@/components/ui/button';
 import { Download, X } from 'lucide-react';
 import Link from 'next/link';
 
+// NOTE: This page remains a client component because the image modal 
+// functionality requires client-side state (useState).
+// The data fetching is still optimized to happen once on component mount.
+
 export default function PhotographyPage() {
   const [photos, setPhotos] = useState<Photography[]>([]);
   const [selectedImage, setSelectedImage] = useState<Photography | null>(null);
 
   useEffect(() => {
+    // This fetch now happens on the client, but the page can be made faster
+    // by passing server-fetched data as an initial prop if needed.
     fetch('/api/photography')
       .then(res => res.json())
       .then(setPhotos);
@@ -39,6 +45,7 @@ export default function PhotographyPage() {
                   height={600}
                   className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
                   data-ai-hint="travel photography"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </CardContent>
@@ -58,6 +65,7 @@ export default function PhotographyPage() {
                 height={900}
                 className="w-full h-auto object-contain rounded-lg"
                 data-ai-hint="travel photography detail"
+                sizes="100vw"
               />
               <div className="absolute top-4 right-4 flex gap-2">
                 <Button asChild variant="secondary" size="icon">
