@@ -77,7 +77,7 @@ export default function BlogPostPage() {
             data-ai-hint="technology blog"
           />
 
-          <div className="prose dark:prose-invert max-w-none text-foreground" dangerouslySetInnerHTML={{ __html: post.content }} />
+          <div className="prose dark:prose-invert max-w-none text-foreground/80" dangerouslySetInnerHTML={{ __html: post.content }} />
 
           <footer className="mt-12">
             <div className="flex flex-wrap items-center gap-2 mb-8">
