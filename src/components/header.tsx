@@ -96,11 +96,12 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-            <div className="hidden md:flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-4">
                 <Link href="#" aria-label="YouTube"><SocialIcons.Youtube className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
                 <Link href="#" aria-label="Instagram"><SocialIcons.Instagram className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
                 <Link href="#" aria-label="Facebook"><SocialIcons.Facebook className="h-5 w-5 text-muted-foreground hover:text-primary"/></Link>
                 <Link href="#" aria-label="Linkedin"><SocialIcons.Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary"/></Link>
+                <Link href="#" aria-label="Github"><SocialIcons.Github className="h-5 w-5 text-muted-foreground hover:text-primary"/></Link>
             </div>
             <Button
                 variant="ghost"
@@ -146,6 +147,7 @@ export default function Header() {
                             <Link href="#" aria-label="Instagram"><div className="w-8 h-8 rounded-md bg-[#C13584] flex items-center justify-center"><SocialIcons.Instagram className="text-white h-5 w-5"/></div></Link>
                             <Link href="#" aria-label="LinkedIn"><div className="w-8 h-8 rounded-md bg-[#0077B5] flex items-center justify-center"><SocialIcons.Linkedin className="text-white h-5 w-5"/></div></Link>
                             <Link href="#" aria-label="YouTube"><div className="w-8 h-8 rounded-md bg-[#FF0000] flex items-center justify-center"><SocialIcons.Youtube className="text-white h-5 w-5"/></div></Link>
+                            <Link href="#" aria-label="GitHub"><div className="w-8 h-8 rounded-md bg-foreground flex items-center justify-center"><SocialIcons.Github className="text-background h-5 w-5"/></div></Link>
                         </div>
                     </div>
                 </SheetContent>

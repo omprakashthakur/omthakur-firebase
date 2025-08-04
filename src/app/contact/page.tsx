@@ -16,8 +16,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Github, Youtube } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
 import Link from "next/link";
+import { SocialIcons } from "@/components/social-icons";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -133,11 +134,11 @@ export default function ContactPage() {
             </CardHeader>
             <CardContent>
               <div className="flex space-x-6">
-                <Link href="#" aria-label="Facebook"><Facebook className="h-8 w-8 text-muted-foreground hover:text-primary" /></Link>
-                <Link href="#" aria-label="Instagram"><Instagram className="h-8 w-8 text-muted-foreground hover:text-primary" /></Link>
-                <Link href="#" aria-label="LinkedIn"><Linkedin className="h-8 w-8 text-muted-foreground hover:text-primary" /></Link>
-                <Link href="#" aria-label="YouTube"><Youtube className="h-8 w-8 text-muted-foreground hover:text-primary" /></Link>
-                <Link href="#" aria-label="GitHub"><Github className="h-8 w-8 text-muted-foreground hover:text-primary" /></Link>
+                <Link href="#" aria-label="Facebook"><SocialIcons.Facebook className="h-8 w-8 text-muted-foreground hover:text-primary" /></Link>
+                <Link href="#" aria-label="Instagram"><SocialIcons.Instagram className="h-8 w-8 text-muted-foreground hover:text-primary" /></Link>
+                <Link href="#" aria-label="LinkedIn"><SocialIcons.Linkedin className="h-8 w-8 text-muted-foreground hover:text-primary" /></Link>
+                <Link href="#" aria-label="YouTube"><SocialIcons.Youtube className="h-8 w-8 text-muted-foreground hover:text-primary" /></Link>
+                <Link href="#" aria-label="GitHub"><SocialIcons.Github className="h-8 w-8 text-muted-foreground hover:text-primary" /></Link>
               </div>
             </CardContent>
           </Card>

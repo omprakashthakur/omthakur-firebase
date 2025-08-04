@@ -30,6 +30,7 @@ export default function Footer() {
                             <Link href="#" aria-label="Instagram"><div className="w-8 h-8 rounded-md bg-[#C13584] flex items-center justify-center"><SocialIcons.Instagram className="text-white h-5 w-5"/></div></Link>
                             <Link href="#" aria-label="LinkedIn"><div className="w-8 h-8 rounded-md bg-[#0077B5] flex items-center justify-center"><SocialIcons.Linkedin className="text-white h-5 w-5"/></div></Link>
                             <Link href="#" aria-label="YouTube"><div className="w-8 h-8 rounded-md bg-[#FF0000] flex items-center justify-center"><SocialIcons.Youtube className="text-white h-5 w-5"/></div></Link>
+                            <Link href="#" aria-label="GitHub"><div className="w-8 h-8 rounded-md bg-foreground flex items-center justify-center"><SocialIcons.Github className="text-background h-5 w-5"/></div></Link>
                         </div>
                     </div>
 
