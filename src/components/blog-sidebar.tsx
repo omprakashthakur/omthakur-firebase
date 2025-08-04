@@ -17,18 +17,18 @@ interface BlogSidebarProps {
 }
 
 const socialNetworks = [
-    { name: 'Instagram', icon: <SocialIcons.Instagram className="text-white" />, url: '#', color: 'bg-[#C13584]' },
-    { name: 'Twitter', icon: <SocialIcons.Twitter className="text-white" />, url: '#', color: 'bg-[#1DA1F2]' },
-    { name: 'Facebook', icon: <SocialIcons.Facebook className="text-white" />, url: '#', color: 'bg-[#4267B2]' },
-    { name: 'Youtube', icon: <SocialIcons.Youtube className="text-white" />, url: '#', color: 'bg-[#FF0000]' },
-    { name: 'Pinterest', icon: <SocialIcons.Pinterest className="text-white" />, url: '#', color: 'bg-[#E60023]' },
-    { name: 'Linkedin', icon: <SocialIcons.Linkedin className="text-white" />, url: '#', color: 'bg-[#0077B5]' },
+    { name: 'Instagram', icon: <SocialIcons.Instagram />, url: '#', color: 'bg-[#C13584]' },
+    { name: 'Twitter', icon: <SocialIcons.Twitter />, url: '#', color: 'bg-[#1DA1F2]' },
+    { name: 'Facebook', icon: <SocialIcons.Facebook />, url: '#', color: 'bg-[#4267B2]' },
+    { name: 'Youtube', icon: <SocialIcons.Youtube />, url: '#', color: 'bg-[#FF0000]' },
+    { name: 'Pinterest', icon: <SocialIcons.Pinterest />, url: '#', color: 'bg-[#E60023]' },
+    { name: 'Linkedin', icon: <SocialIcons.Linkedin />, url: '#', color: 'bg-[#0077B5]' },
 ];
 
 const categoryIcons = {
-    'Tech': <Code className="h-4 w-4 text-white" />,
-    'Current Affairs': <Newspaper className="h-4 w-4 text-white" />,
-    'Personal': <User className="h-4 w-4 text-white" />
+    'Tech': <Code className="h-5 w-5 text-white" />,
+    'Current Affairs': <Newspaper className="h-5 w-5 text-white" />,
+    'Personal': <User className="h-5 w-5 text-white" />
 } as const;
 
 const categoryColors = {
@@ -66,8 +66,8 @@ export default function BlogSidebar({
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-3">
           {socialNetworks.map((network) => (
-             <Link key={network.name} href={network.url} className="flex items-center gap-3 rounded-lg bg-secondary/70 p-3 transition-transform duration-300 hover:scale-105 hover:shadow-lg dark:bg-secondary/20">
-                <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${network.color}`}>
+             <Link key={network.name} href={network.url} className="flex items-center gap-3 rounded-lg bg-secondary/50 p-3 transition-colors duration-300 hover:bg-secondary dark:bg-secondary/20 dark:hover:bg-secondary/40 shadow-sm hover:shadow-md">
+                <div className={`flex h-8 w-8 items-center justify-center rounded-md ${network.color}`}>
                   {network.icon}
                 </div>
                 <span className="font-semibold text-sm">{network.name}</span>
@@ -84,9 +84,9 @@ export default function BlogSidebar({
           {(categories as Array<keyof typeof categoryIcons>).map((category) => (
              <Link href={`/blog?category=${category}`} key={category} className="block relative h-24 rounded-lg overflow-hidden group shadow-md hover:shadow-xl transition-all duration-300">
                 <Image src="https://placehold.co/400x200.png" alt={category} layout="fill" objectFit="cover" className="group-hover:scale-110 transition-transform duration-500" data-ai-hint="landscape abstract" />
-                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors duration-300" />
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-300" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="flex items-center gap-3 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-4 py-2 rounded-lg">
+                    <div className="flex items-center gap-3 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
                        <div className={`p-2 rounded-md ${categoryColors[category]}`}>
                          {categoryIcons[category]}
                        </div>
