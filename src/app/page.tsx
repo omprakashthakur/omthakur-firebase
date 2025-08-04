@@ -34,7 +34,7 @@ export default function Home() {
       <section className="bg-background">
         <div className="container mx-auto px-4 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center">
             <div className="text-center md:text-left">
-                <h1 className="text-4xl md:text-6xl font-headline font-bold text-primary dark:text-primary-foreground">Om Thakur</h1>
+                <h1 className="text-4xl md:text-6xl font-headline font-bold text-primary dark:text-primary">Om Thakur</h1>
                 <p className="mt-4 text-lg md:text-xl text-muted-foreground">
                     Software Engineer | Tech Content Writer | Traveler | Vlogger ▶️ | Photographer 📸
                 </p>

@@ -9,7 +9,7 @@ export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-16">
       <section className="text-center mb-16">
-        <h1 className="text-5xl font-headline font-bold text-primary dark:text-primary-foreground mb-4">About Me</h1>
+        <h1 className="text-5xl font-headline font-bold text-primary dark:text-primary mb-4">About Me</h1>
         <p className="text-xl text-muted-foreground">A glimpse into my world of code, creativity, and curiosity.</p>
       </section>
 

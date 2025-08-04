@@ -55,7 +55,7 @@ export default function BlogPostPage() {
         <article className="lg:col-span-3">
           <header className="mb-8">
             <Badge variant="secondary" className="mb-4">{post.category}</Badge>
-            <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary dark:text-primary-foreground mb-4">{post.title}</h1>
+            <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary dark:text-primary mb-4">{post.title}</h1>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-muted-foreground">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4" />
