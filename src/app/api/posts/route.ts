@@ -1,29 +1,46 @@
 import { NextResponse } from 'next/server';
-import { blogPosts } from '@/lib/data';
+import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import type { BlogPost } from '@/lib/data';
 
 // GET all blog posts
 export async function GET() {
-  return NextResponse.json(blogPosts);
+  try {
+    const postsCollection = collection(db, 'posts');
+    const postsSnapshot = await getDocs(postsCollection);
+    const postsList = postsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+    return NextResponse.json(postsList);
+  } catch (error) {
+    return NextResponse.json({ message: 'Error fetching posts', error }, { status: 500 });
+  }
 }
 
 // POST a new blog post
 export async function POST(request: Request) {
   try {
-    const post: BlogPost = await request.json();
+    const post: Omit<BlogPost, 'slug'> = await request.json();
     
     // Basic validation
-    if (!post.title || !post.content || !post.slug) {
+    if (!post.title || !post.content) {
         return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
+    const slug = post.title.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+
     // Check if slug already exists
-    if (blogPosts.find(p => p.slug === post.slug)) {
+    const postsCollection = collection(db, 'posts');
+    const q = query(postsCollection, where("slug", "==", slug));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
         return NextResponse.json({ message: 'Slug already exists' }, { status: 409 });
     }
 
-    blogPosts.unshift(post); // Add to the beginning of the array
-    return NextResponse.json(post, { status: 201 });
+    const docRef = await addDoc(postsCollection, {
+      ...post,
+      slug,
+    });
+    
+    return NextResponse.json({ id: docRef.id, ...post, slug }, { status: 201 });
 
   } catch (error) {
     return NextResponse.json({ message: 'Error creating post', error }, { status: 500 });

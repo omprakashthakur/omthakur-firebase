@@ -1,6 +1,6 @@
-
 import { NextResponse } from 'next/server';
-import { photography } from '@/lib/data';
+import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import type { Photography } from '@/lib/data';
 
 // GET a single photo by id
@@ -8,11 +8,15 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const photo = photography.find(p => p.id === Number(params.id));
-  if (photo) {
-    return NextResponse.json(photo);
+  try {
+    const photoDoc = await getDoc(doc(db, 'photography', params.id));
+    if (!photoDoc.exists()) {
+        return NextResponse.json({ message: 'Photo not found' }, { status: 404 });
+    }
+    return NextResponse.json({ ...photoDoc.data(), id: photoDoc.id });
+  } catch (error) {
+    return NextResponse.json({ message: 'Error fetching photo', error }, { status: 500 });
   }
-  return NextResponse.json({ message: 'Photo not found' }, { status: 404 });
 }
 
 // PUT (update) a photo by id
@@ -22,19 +26,17 @@ export async function PUT(
 ) {
   try {
     const updatedPhotoData: Partial<Omit<Photography, 'id'>> = await request.json();
-    const photoIndex = photography.findIndex(p => p.id === Number(params.id));
+    const photoRef = doc(db, 'photography', params.id);
 
-    if (photoIndex === -1) {
+    const photoSnap = await getDoc(photoRef);
+    if (!photoSnap.exists()) {
       return NextResponse.json({ message: 'Photo not found' }, { status: 404 });
     }
+    
+    await updateDoc(photoRef, updatedPhotoData);
+    const updatedDoc = await getDoc(photoRef);
 
-    const updatedPhoto = { 
-      ...photography[photoIndex], 
-      ...updatedPhotoData,
-    };
-    photography[photoIndex] = updatedPhoto;
-
-    return NextResponse.json(updatedPhoto);
+    return NextResponse.json({ ...updatedDoc.data(), id: updatedDoc.id });
   } catch (error) {
     let errorMessage = 'Error updating photo';
     if (error instanceof Error) {
@@ -49,13 +51,16 @@ export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const photoIndex = photography.findIndex(p => p.id === Number(params.id));
-
-  if (photoIndex === -1) {
-    return NextResponse.json({ message: 'Photo not found' }, { status: 404 });
+  try {
+    const photoRef = doc(db, 'photography', params.id);
+    const photoSnap = await getDoc(photoRef);
+    if (!photoSnap.exists()) {
+      return NextResponse.json({ message: 'Photo not found' }, { status: 404 });
+    }
+    
+    await deleteDoc(photoRef);
+    return NextResponse.json({ message: 'Photo deleted successfully' });
+  } catch (error) {
+    return NextResponse.json({ message: 'Error deleting photo' }, { status: 500 });
   }
-
-  const deletedPhoto = photography.splice(photoIndex, 1);
-
-  return NextResponse.json({ message: 'Photo deleted successfully', photo: deletedPhoto[0] });
 }

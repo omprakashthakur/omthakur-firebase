@@ -1,6 +1,6 @@
-
 import { NextResponse } from 'next/server';
-import { vlogs } from '@/lib/data';
+import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import type { Vlog } from '@/lib/data';
 
 // GET a single vlog by id
@@ -8,11 +8,15 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const vlog = vlogs.find(v => v.id === Number(params.id));
-  if (vlog) {
-    return NextResponse.json(vlog);
+  try {
+    const vlogDoc = await getDoc(doc(db, 'vlogs', params.id));
+    if (!vlogDoc.exists()) {
+        return NextResponse.json({ message: 'Vlog not found' }, { status: 404 });
+    }
+    return NextResponse.json({ ...vlogDoc.data(), id: vlogDoc.id });
+  } catch (error) {
+    return NextResponse.json({ message: 'Error fetching vlog', error }, { status: 500 });
   }
-  return NextResponse.json({ message: 'Vlog not found' }, { status: 404 });
 }
 
 // PUT (update) a vlog by id
@@ -22,19 +26,18 @@ export async function PUT(
 ) {
   try {
     const updatedVlogData: Partial<Omit<Vlog, 'id'>> = await request.json();
-    const vlogIndex = vlogs.findIndex(v => v.id === Number(params.id));
+    const vlogRef = doc(db, 'vlogs', params.id);
 
-    if (vlogIndex === -1) {
-      return NextResponse.json({ message: 'Vlog not found' }, { status: 404 });
+    // Check if doc exists
+    const vlogSnap = await getDoc(vlogRef);
+    if (!vlogSnap.exists()) {
+        return NextResponse.json({ message: 'Vlog not found' }, { status: 404 });
     }
 
-    const updatedVlog = { 
-      ...vlogs[vlogIndex], 
-      ...updatedVlogData,
-    };
-    vlogs[vlogIndex] = updatedVlog;
+    await updateDoc(vlogRef, updatedVlogData);
+    const updatedDoc = await getDoc(vlogRef);
 
-    return NextResponse.json(updatedVlog);
+    return NextResponse.json({ ...updatedDoc.data(), id: updatedDoc.id });
   } catch (error) {
     let errorMessage = 'Error updating vlog';
     if (error instanceof Error) {
@@ -49,13 +52,16 @@ export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const vlogIndex = vlogs.findIndex(v => v.id === Number(params.id));
-
-  if (vlogIndex === -1) {
-    return NextResponse.json({ message: 'Vlog not found' }, { status: 404 });
+  try {
+    const vlogRef = doc(db, 'vlogs', params.id);
+    const vlogSnap = await getDoc(vlogRef);
+    if (!vlogSnap.exists()) {
+        return NextResponse.json({ message: 'Vlog not found' }, { status: 404 });
+    }
+    
+    await deleteDoc(vlogRef);
+    return NextResponse.json({ message: 'Vlog deleted successfully' });
+  } catch (error) {
+    return NextResponse.json({ message: 'Error deleting vlog' }, { status: 500 });
   }
-
-  const deletedVlog = vlogs.splice(vlogIndex, 1);
-
-  return NextResponse.json({ message: 'Vlog deleted successfully', vlog: deletedVlog[0] });
 }

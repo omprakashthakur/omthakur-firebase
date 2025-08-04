@@ -1,24 +1,42 @@
+
+"use client";
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Calendar, User } from 'lucide-react';
-import { blogPosts, categories, allTags } from '@/lib/data';
+import type { BlogPost } from '@/lib/data';
 import BlogSidebar from '@/components/blog-sidebar';
+import { useEffect, useState } from 'react';
 
 const POSTS_PER_PAGE = 6;
 
-export default function BlogPage({
-  searchParams,
-}: {
-  searchParams: { category?: string; tag?: string; page?: string };
-}) {
-  const currentPage = Number(searchParams.page) || 1;
-  const selectedCategory = searchParams.category;
-  const selectedTag = searchParams.tag;
+export default function BlogPage() {
+  const searchParams = useSearchParams();
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [allTags, setAllTags] = useState<string[]>([]);
+  
+  useEffect(() => {
+    fetch('/api/posts')
+      .then(res => res.json())
+      .then(data => {
+        setPosts(data);
+        const uniqueCategories = Array.from(new Set(data.map((p: BlogPost) => p.category)));
+        const uniqueTags = Array.from(new Set(data.flatMap((p: BlogPost) => p.tags)));
+        setCategories(uniqueCategories as string[]);
+        setAllTags(uniqueTags as string[]);
+      });
+  }, []);
 
-  const filteredPosts = blogPosts
+  const currentPage = Number(searchParams.get('page')) || 1;
+  const selectedCategory = searchParams.get('category');
+  const selectedTag = searchParams.get('tag');
+
+  const filteredPosts = posts
     .filter(post => !selectedCategory || post.category === selectedCategory)
     .filter(post => !selectedTag || post.tags.includes(selectedTag));
   
@@ -28,7 +46,7 @@ export default function BlogPage({
     currentPage * POSTS_PER_PAGE
   );
 
-  const recentPosts = blogPosts.slice(0, 5);
+  const recentPosts = posts.slice(0, 5);
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -101,8 +119,8 @@ export default function BlogPage({
             categories={categories}
             tags={allTags}
             recentPosts={recentPosts}
-            currentCategory={selectedCategory}
-            currentTag={selectedTag}
+            currentCategory={selectedCategory || undefined}
+            currentTag={selectedTag || undefined}
           />
         </aside>
       </div>

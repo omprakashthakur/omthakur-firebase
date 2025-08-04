@@ -1,8 +1,9 @@
+
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { photography, type Photography } from '@/lib/data';
+import type { Photography } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,14 @@ import { Download, X } from 'lucide-react';
 import Link from 'next/link';
 
 export default function PhotographyPage() {
+  const [photos, setPhotos] = useState<Photography[]>([]);
   const [selectedImage, setSelectedImage] = useState<Photography | null>(null);
+
+  useEffect(() => {
+    fetch('/api/photography')
+      .then(res => res.json())
+      .then(setPhotos);
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -20,8 +28,8 @@ export default function PhotographyPage() {
       </header>
 
       <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
-        {photography.map((photo, index) => (
-          <div key={index} className="break-inside-avoid" onClick={() => setSelectedImage(photo)}>
+        {photos.map((photo) => (
+          <div key={photo.id} className="break-inside-avoid" onClick={() => setSelectedImage(photo)}>
             <Card className="overflow-hidden cursor-pointer group shadow-lg hover:shadow-2xl transition-all duration-300">
               <CardContent className="p-0 relative">
                 <Image

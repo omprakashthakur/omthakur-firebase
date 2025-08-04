@@ -1,10 +1,13 @@
+
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { blogPosts, photography, vlogs } from "@/lib/data";
+import type { BlogPost, Photography, Vlog } from "@/lib/data";
 import {
   Carousel,
   CarouselContent,
@@ -12,11 +15,18 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  const recentPosts = blogPosts.slice(0, 3);
-  const featuredVlogs = vlogs.slice(0, 3);
-  const photoGallery = photography.slice(0, 6);
+  const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
+  const [featuredVlogs, setFeaturedVlogs] = useState<Vlog[]>([]);
+  const [photoGallery, setPhotoGallery] = useState<Photography[]>([]);
+
+  useEffect(() => {
+    fetch('/api/posts').then(res => res.json()).then(data => setRecentPosts(data.slice(0, 3)));
+    fetch('/api/vlogs').then(res => res.json()).then(data => setFeaturedVlogs(data.slice(0, 3)));
+    fetch('/api/photography').then(res => res.json()).then(data => setPhotoGallery(data.slice(0, 6)));
+  }, []);
 
   return (
     <div className="flex flex-col">

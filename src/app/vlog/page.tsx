@@ -1,15 +1,25 @@
+
+"use client";
+
 import Image from 'next/image';
 import Link from 'next/link';
-import { vlogs } from '@/lib/data';
+import { vlogs as defaultVlogs, type Vlog, vlogCategories, vlogPlatforms } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PlayCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-const platforms: ('YouTube' | 'Instagram' | 'TikTok')[] = ['YouTube', 'Instagram', 'TikTok'];
-const vlogCategories: ('Travel' | 'Tech Talks' | 'Daily Life')[] = ['Travel', 'Tech Talks', 'Daily Life'];
+const platforms = vlogPlatforms;
+const categories = vlogCategories;
 
 export default function VlogPage() {
+  const [vlogs, setVlogs] = useState<Vlog[]>([]);
+
+  useEffect(() => {
+    fetch('/api/vlogs').then(res => res.json()).then(setVlogs);
+  }, []);
+
   return (
     <div className="container mx-auto px-4 py-16">
       <header className="text-center mb-16">
@@ -29,7 +39,7 @@ export default function VlogPage() {
           return (
             <TabsContent key={platform} value={platform}>
               <div className="mt-12">
-                {vlogCategories.map(category => {
+                {categories.map(category => {
                   const categoryVlogs = platformVlogs.filter(vlog => vlog.category === category);
                   if (categoryVlogs.length === 0) return null;
                   return (
@@ -37,7 +47,7 @@ export default function VlogPage() {
                       <h2 className="text-3xl font-headline font-semibold mb-6">{category}</h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {categoryVlogs.map(vlog => (
-                          <Card key={vlog.title} className="group overflow-hidden shadow-lg relative">
+                          <Card key={vlog.id} className="group overflow-hidden shadow-lg relative">
                             <Link href={vlog.url} target="_blank" rel="noopener noreferrer" className="block">
                               <Image
                                 src={vlog.thumbnail}

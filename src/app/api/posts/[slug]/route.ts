@@ -1,17 +1,37 @@
 import { NextResponse } from 'next/server';
-import { blogPosts } from '@/lib/data';
+import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import type { BlogPost } from '@/lib/data';
+
+async function getPostDocumentId(slug: string): Promise<string | null> {
+    const postsCollection = collection(db, 'posts');
+    const q = query(postsCollection, where("slug", "==", slug));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+        return null;
+    }
+    return querySnapshot.docs[0].id;
+}
+
 
 // GET a single blog post by slug
 export async function GET(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
-  const post = blogPosts.find(p => p.slug === params.slug);
-  if (post) {
-    return NextResponse.json(post);
+  try {
+    const docId = await getPostDocumentId(params.slug);
+    if (!docId) {
+        return NextResponse.json({ message: 'Post not found' }, { status: 404 });
+    }
+    const postDoc = await getDoc(doc(db, 'posts', docId));
+    if (!postDoc.exists()) {
+        return NextResponse.json({ message: 'Post not found' }, { status: 404 });
+    }
+    return NextResponse.json({ ...postDoc.data(), id: postDoc.id });
+  } catch (error) {
+    return NextResponse.json({ message: 'Error fetching post', error }, { status: 500 });
   }
-  return NextResponse.json({ message: 'Post not found' }, { status: 404 });
 }
 
 // PUT (update) a blog post by slug
@@ -21,22 +41,18 @@ export async function PUT(
 ) {
   try {
     const updatedPostData: Partial<Omit<BlogPost, 'slug'>> = await request.json();
-    const postIndex = blogPosts.findIndex(p => p.slug === params.slug);
-
-    if (postIndex === -1) {
+    const docId = await getPostDocumentId(params.slug);
+    
+    if (!docId) {
       return NextResponse.json({ message: 'Post not found' }, { status: 404 });
     }
 
-    // Merge new data with existing data
-    const updatedPost = { 
-      ...blogPosts[postIndex], 
-      ...updatedPostData,
-      // Ensure tags are always an array
-      tags: Array.isArray(updatedPostData.tags) ? updatedPostData.tags : blogPosts[postIndex].tags,
-    };
-    blogPosts[postIndex] = updatedPost;
+    const postRef = doc(db, 'posts', docId);
+    await updateDoc(postRef, updatedPostData);
 
-    return NextResponse.json(updatedPost);
+    const updatedDoc = await getDoc(postRef);
+
+    return NextResponse.json({ ...updatedDoc.data(), id: updatedDoc.id });
   } catch (error) {
     let errorMessage = 'Error updating post';
     if (error instanceof Error) {
@@ -51,13 +67,14 @@ export async function DELETE(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
-  const postIndex = blogPosts.findIndex(p => p.slug === params.slug);
-
-  if (postIndex === -1) {
-    return NextResponse.json({ message: 'Post not found' }, { status: 404 });
+  try {
+    const docId = await getPostDocumentId(params.slug);
+    if (!docId) {
+        return NextResponse.json({ message: 'Post not found' }, { status: 404 });
+    }
+    await deleteDoc(doc(db, 'posts', docId));
+    return NextResponse.json({ message: 'Post deleted successfully' });
+  } catch (error) {
+    return NextResponse.json({ message: 'Error deleting post' }, { status: 500 });
   }
-
-  const deletedPost = blogPosts.splice(postIndex, 1);
-
-  return NextResponse.json({ message: 'Post deleted successfully', post: deletedPost[0] });
 }

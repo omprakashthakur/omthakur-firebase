@@ -1,6 +1,9 @@
-import { notFound } from 'next/navigation';
+
+"use client"
+
+import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
-import { blogPosts, categories, allTags } from '@/lib/data';
+import type { BlogPost } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar, User, Tag, Heart } from 'lucide-react';
@@ -8,21 +11,43 @@ import Link from 'next/link';
 import BlogSidebar from '@/components/blog-sidebar';
 import ShareButtons from '@/components/share-buttons';
 import CommentSection from '@/components/comment-section';
+import { useEffect, useState } from 'react';
+import { categories as allCategories, allTags as allPostTags } from '@/lib/data';
 
-export async function generateStaticParams() {
-  return blogPosts.map(post => ({
-    slug: post.slug,
-  }));
-}
+export default function BlogPostPage() {
+  const params = useParams();
+  const slug = params.slug as string;
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = blogPosts.find(p => p.slug === params.slug);
+  useEffect(() => {
+    if (slug) {
+      fetch(`/api/posts/${slug}`)
+        .then(res => res.json())
+        .then(data => {
+          if(data.message) {
+            notFound();
+          } else {
+            setPost(data)
+          }
+        })
+        .finally(() => setLoading(false));
+      
+      fetch('/api/posts')
+        .then(res => res.json())
+        .then(data => setRecentPosts(data.filter((p: BlogPost) => p.slug !== slug).slice(0, 5)));
 
-  if (!post) {
-    notFound();
+    }
+  }, [slug]);
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
   
-  const recentPosts = blogPosts.filter(p => p.slug !== post.slug).slice(0, 5);
+  if (!post) {
+    return notFound();
+  }
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -83,8 +108,8 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
 
         <aside className="lg:col-span-1">
           <BlogSidebar
-            categories={categories}
-            tags={allTags}
+            categories={allCategories}
+            tags={allPostTags}
             recentPosts={recentPosts}
             currentCategory={post.category}
           />
