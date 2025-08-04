@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Newspaper, BarChart2, Video } from 'lucide-react';
+import { Home, Newspaper, BarChart2, Video, Camera } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -27,6 +27,7 @@ export default function AdminLayout({
   const menuItems = [
     { href: '/admin/dashboard', label: 'Posts', icon: Newspaper },
     { href: '/admin/vlogs', label: 'Vlogs', icon: Video },
+    { href: '/admin/photography', label: 'Photography', icon: Camera },
     { href: '/admin/analytics', label: 'Analytics', icon: BarChart2 },
   ];
 
