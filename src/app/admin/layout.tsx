@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Newspaper, BarChart2, Video, Camera } from 'lucide-react';
+import { Home, Newspaper, BarChart2, Video, Camera, User } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -13,9 +13,12 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarInset,
-  SidebarTrigger
+  SidebarTrigger,
+  SidebarFooter,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function AdminLayout({
   children,
@@ -40,9 +43,9 @@ export default function AdminLayout({
                 <Button variant="ghost" size="icon" asChild>
                   <Home className="w-5 h-5" />
                 </Button>
-                <span>Back to Site</span>
+                <span className="group-data-[collapsible=icon]:hidden">Back to Site</span>
              </Link>
-             <SidebarTrigger />
+             <SidebarTrigger className="group-data-[collapsible=icon]:hidden"/>
            </div>
         </SidebarHeader>
         <SidebarContent>
@@ -65,6 +68,22 @@ export default function AdminLayout({
             ))}
           </SidebarMenu>
         </SidebarContent>
+        <SidebarSeparator />
+        <SidebarFooter>
+           <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/admin/profile'} tooltip={{children: "Profile"}}>
+                  <Link href="/admin/profile">
+                    <Avatar className="size-6">
+                        <AvatarImage src="https://placehold.co/100x100.png" alt="Om Thakur" data-ai-hint="person avatar" />
+                        <AvatarFallback>OT</AvatarFallback>
+                    </Avatar>
+                    <span>My Profile</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+           </SidebarMenu>
+        </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <div className="p-4 md:p-8">
