@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -5,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -122,6 +123,9 @@ export default function Header() {
                     </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                    <SheetHeader>
+                        <SheetTitle className="sr-only">Mobile Navigation Menu</SheetTitle>
+                    </SheetHeader>
                     <div className="p-6">
                         <nav className="flex flex-col gap-6 text-lg font-medium">
                             {navLinks.map((link) => (
