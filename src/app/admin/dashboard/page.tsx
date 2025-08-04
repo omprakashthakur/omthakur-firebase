@@ -62,9 +62,9 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-16">
+    <>
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-headline font-bold">Admin Dashboard</h1>
+        <h1 className="text-4xl font-headline font-bold">Posts</h1>
         <Button asChild>
           <Link href="/admin/posts/new">
             <PlusCircle className="mr-2 h-4 w-4" />
@@ -123,6 +123,6 @@ export default function AdminDashboardPage() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </>
   );
 }

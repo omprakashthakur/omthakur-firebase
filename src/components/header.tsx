@@ -37,7 +37,6 @@ const navLinks = [
   { href: "/photography", label: "Photography" },
   { href: "/about", label: "About Me" },
   { href: "/contact", label: "Contact" },
-  { href: "/admin/dashboard", label: "Admin" },
 ];
 
 export default function Header() {
@@ -57,6 +56,10 @@ export default function Header() {
       {children}
     </Link>
   );
+
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -82,6 +85,9 @@ export default function Header() {
                       <Link href={item.href}>{item.label}</Link>
                     </DropdownMenuItem>
                   ))}
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin/dashboard">Admin</Link>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
@@ -126,6 +132,7 @@ export default function Header() {
                                             {link.items?.map((item) => (
                                                 <NavLink key={item.label} href={item.href}>{item.label}</NavLink>
                                             ))}
+                                             <NavLink href="/admin/dashboard">Admin</NavLink>
                                             </div>
                                         </>
                                     ) : (
