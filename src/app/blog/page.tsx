@@ -60,13 +60,13 @@ export default function BlogPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {paginatedPosts.map(post => (
               <Card key={post.slug} className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <Link href={`/blog/${post.slug}`} className="block">
+                <Link href={`/blog/${post.slug}`} className="block relative h-56">
                   <Image
                     src={post.image}
                     alt={post.title}
-                    width={600}
-                    height={400}
-                    className="w-full h-56 object-cover"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover"
                     data-ai-hint="technology blog"
                   />
                 </Link>

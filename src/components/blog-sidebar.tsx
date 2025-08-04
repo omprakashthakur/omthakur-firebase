@@ -83,7 +83,7 @@ export default function BlogSidebar({
         <CardContent className="space-y-4">
           {(categories as Array<keyof typeof categoryIcons>).map((category) => (
              <Link href={`/blog?category=${category}`} key={category} className="block relative h-24 rounded-lg overflow-hidden group shadow-md hover:shadow-xl transition-all duration-300">
-                <Image src="https://placehold.co/400x200.png" alt={category} layout="fill" objectFit="cover" className="group-hover:scale-110 transition-transform duration-500" data-ai-hint="landscape abstract" />
+                <Image src="https://placehold.co/400x200.png" alt={category} fill sizes="300px" className="object-cover group-hover:scale-110 transition-transform duration-500" data-ai-hint="landscape abstract" />
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-300" />
                 <div className="absolute inset-0 flex items-center justify-center">
                     <div className="flex items-center gap-3 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">

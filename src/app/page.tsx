@@ -51,9 +51,10 @@ export default function Home() {
                 <Image
                     src="https://placehold.co/800x600.png"
                     alt="Woman working on a computer"
-                    layout="fill"
-                    objectFit="cover"
-                    className="w-full h-full"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority
+                    className="w-full h-full object-cover"
                     data-ai-hint="woman technology computer"
                 />
             </div>
@@ -83,13 +84,13 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {recentPosts.map((post) => (
               <Card key={post.slug} className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <Link href={`/blog/${post.slug}`} className="block">
+                <Link href={`/blog/${post.slug}`} className="block relative h-48">
                   <Image
                     src={post.image}
                     alt={post.title}
-                    width={600}
-                    height={400}
-                    className="w-full h-48 object-cover"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover"
                     data-ai-hint="technology blog"
                   />
                 </Link>
@@ -125,13 +126,13 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featuredVlogs.map((vlog) => (
               <Card key={vlog.title} className="group overflow-hidden shadow-lg relative">
-                <Link href="/vlog" className="block">
+                <Link href="/vlog" className="block relative h-60">
                   <Image
                     src={vlog.thumbnail}
                     alt={vlog.title}
-                    width={600}
-                    height={400}
-                    className="w-full h-60 object-cover transition-transform duration-300 group-hover:scale-105"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     data-ai-hint="travel vlog"
                   />
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -165,13 +166,13 @@ export default function Home() {
                     <div className="p-1">
                       <Card className="overflow-hidden">
                         <CardContent className="flex aspect-square items-center justify-center p-0">
-                          <Link href="/photography">
+                          <Link href="/photography" className="relative block w-full h-full">
                             <Image
                               src={photo.src}
                               alt={photo.alt}
-                              width={600}
-                              height={600}
-                              className="w-full h-full object-cover"
+                              fill
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                              className="object-cover"
                               data-ai-hint="travel photography"
                             />
                           </Link>
