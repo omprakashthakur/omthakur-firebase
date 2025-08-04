@@ -55,13 +55,11 @@ export default function BlogSidebar({
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-3">
           {socialNetworks.map((network) => (
-            <Link key={network.name} href={network.url} legacyBehavior>
-              <a className="flex items-center gap-3 rounded-lg bg-secondary/70 p-3 transition-transform duration-300 hover:scale-105 hover:shadow-lg">
+            <Link key={network.name} href={network.url} className="flex items-center gap-3 rounded-lg bg-secondary/70 p-3 transition-transform duration-300 hover:scale-105 hover:shadow-lg">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white">
                   {network.icon}
                 </div>
                 <span className="font-semibold text-sm">{network.name}</span>
-              </a>
             </Link>
           ))}
         </CardContent>

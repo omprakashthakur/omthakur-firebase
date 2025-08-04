@@ -31,20 +31,33 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="py-20 md:py-32 bg-secondary/50">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-headline font-bold text-primary dark:text-primary-foreground">Om Thakur</h1>
-          <p className="mt-4 text-lg md:text-xl text-muted-foreground">
-            Software Engineer | Tech Content Writer | Traveler | Vlogger ▶️ | Photographer 📸
-          </p>
-          <div className="mt-8 flex justify-center gap-4">
-            <Button asChild size="lg">
-              <Link href="/blog">Read The Blog</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="/about">About Me</Link>
-            </Button>
-          </div>
+      <section className="relative py-20 md:py-32 bg-secondary/50">
+        <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+            <div className="text-center md:text-left">
+                <h1 className="text-4xl md:text-6xl font-headline font-bold text-primary dark:text-primary-foreground">Om Thakur</h1>
+                <p className="mt-4 text-lg md:text-xl text-muted-foreground">
+                    Software Engineer | Tech Content Writer | Traveler | Vlogger ▶️ | Photographer 📸
+                </p>
+                <div className="mt-8 flex justify-center md:justify-start gap-4">
+                    <Button asChild size="lg">
+                    <Link href="/blog">Read The Blog</Link>
+                    </Button>
+                    <Button asChild size="lg" variant="outline">
+                    <Link href="/about">About Me</Link>
+                    </Button>
+                </div>
+            </div>
+            <div className="relative h-64 md:h-full min-h-[300px] rounded-lg shadow-2xl overflow-hidden">
+                <Image
+                    src="https://placehold.co/800x600.png"
+                    alt="Woman working on a computer"
+                    layout="fill"
+                    objectFit="cover"
+                    className="w-full h-full"
+                    data-ai-hint="woman technology computer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            </div>
         </div>
       </section>
       
