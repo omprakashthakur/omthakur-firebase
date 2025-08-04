@@ -31,8 +31,8 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative py-20 md:py-32 bg-secondary/50">
-        <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+      <section className="bg-background">
+        <div className="container mx-auto px-4 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center">
             <div className="text-center md:text-left">
                 <h1 className="text-4xl md:text-6xl font-headline font-bold text-primary dark:text-primary-foreground">Om Thakur</h1>
                 <p className="mt-4 text-lg md:text-xl text-muted-foreground">
@@ -47,7 +47,7 @@ export default function Home() {
                     </Button>
                 </div>
             </div>
-            <div className="relative h-64 md:h-full min-h-[300px] rounded-lg shadow-2xl overflow-hidden">
+            <div className="relative h-64 md:h-auto md:aspect-[4/3] rounded-lg shadow-2xl overflow-hidden">
                 <Image
                     src="https://placehold.co/800x600.png"
                     alt="Woman working on a computer"
@@ -56,15 +56,14 @@ export default function Home() {
                     className="w-full h-full"
                     data-ai-hint="woman technology computer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
             </div>
         </div>
       </section>
       
       {/* About Me Snippet */}
-      <section className="py-16 md:py-24">
+      <section className="py-16 md:py-24 bg-secondary/50">
         <div className="container mx-auto px-4">
-            <Card className="max-w-4xl mx-auto text-center p-8 shadow-lg">
+            <Card className="max-w-4xl mx-auto text-center p-8 shadow-lg bg-card/80 backdrop-blur-sm">
                 <CardHeader>
                     <h2 className="text-3xl font-headline font-semibold">Welcome to my digital space!</h2>
                 </CardHeader>
@@ -78,7 +77,7 @@ export default function Home() {
       </section>
 
       {/* Recent Blog Posts */}
-      <section className="py-16 md:py-24 bg-secondary/50">
+      <section className="py-16 md:py-24 bg-background">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-headline font-bold text-center mb-12">Recent Blog Posts</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -120,7 +119,7 @@ export default function Home() {
       </section>
 
       {/* Featured Vlogs */}
-      <section className="py-16 md:py-24">
+      <section className="py-16 md:py-24 bg-secondary/50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-headline font-bold text-center mb-12">Featured Vlogs</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -150,7 +149,7 @@ export default function Home() {
       </section>
 
       {/* Photography Highlights */}
-      <section className="py-16 md:py-24 bg-secondary/50">
+      <section className="py-16 md:py-24 bg-background">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-headline font-bold text-center mb-12">Photography</h2>
             <Carousel

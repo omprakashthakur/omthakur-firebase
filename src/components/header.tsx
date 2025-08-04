@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Menu, X, Youtube, Instagram, Linkedin, Facebook, Github, Sun, Moon } from "lucide-react";
+import { Menu, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -15,12 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/use-auth";
-
-const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-        <path d="M12.528 8.003c-.22.282-.41.61-.55.954-.14.344-.21.713-.21 1.093v6.23a1.44 1.44 0 0 1-1.44 1.44h-2.88a1.44 1.44 0 0 1-1.44-1.44v-2.88a1.44 1.44 0 0 1 1.44-1.44h.029c.282.22.61.41.954.55.344.14.713.21 1.093.21v-6.23a1.44 1.44 0 0 1 1.44-1.44h2.88a1.44 1.44 0 0 1 1.44 1.44v2.88a1.44 1.44 0 0 1-1.44 1.44h-.029c-.282-.22-.61-.41-.954-.55-.344-.14-.713-.21-1.093-.21z"></path>
-    </svg>
-);
+import { SocialIcons } from "./social-icons";
 
 
 const navLinks = [
@@ -100,11 +95,11 @@ export default function Header() {
           )}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
             <div className="hidden md:flex items-center gap-3">
-                <Link href="#" aria-label="YouTube"><Youtube className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-                <Link href="#" aria-label="Instagram"><Instagram className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-                <Link href="#" aria-label="TikTok"><TikTokIcon className="h-5 w-5 text-muted-foreground hover:text-primary"/></Link>
+                <Link href="#" aria-label="YouTube"><SocialIcons.Youtube className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+                <Link href="#" aria-label="Instagram"><SocialIcons.Instagram className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+                <Link href="#" aria-label="TikTok"><SocialIcons.TikTok className="h-5 w-5 text-muted-foreground hover:text-primary"/></Link>
             </div>
             <Button
                 variant="ghost"
@@ -146,12 +141,12 @@ export default function Header() {
                             ))}
                         </nav>
                         <div className="mt-8 flex justify-center gap-6">
-                            <Link href="#" aria-label="YouTube"><Youtube className="h-6 w-6 text-muted-foreground hover:text-primary" /></Link>
-                            <Link href="#" aria-label="Instagram"><Instagram className="h-6 w-6 text-muted-foreground hover:text-primary" /></Link>
-                            <Link href="#" aria-label="LinkedIn"><Linkedin className="h-6 w-6 text-muted-foreground hover:text-primary" /></Link>
-                            <Link href="#" aria-label="Facebook"><Facebook className="h-6 w-6 text-muted-foreground hover:text-primary" /></Link>
-                            <Link href="#" aria-label="GitHub"><Github className="h-6 w-6 text-muted-foreground hover:text-primary" /></Link>
-                             <Link href="#" aria-label="TikTok"><TikTokIcon className="h-6 w-6 text-muted-foreground hover:text-primary"/></Link>
+                            <Link href="#" aria-label="YouTube"><SocialIcons.Youtube className="h-6 w-6 text-muted-foreground hover:text-primary" /></Link>
+                            <Link href="#" aria-label="Instagram"><SocialIcons.Instagram className="h-6 w-6 text-muted-foreground hover:text-primary" /></Link>
+                            <Link href="#" aria-label="LinkedIn"><SocialIcons.Linkedin className="h-6 w-6 text-muted-foreground hover:text-primary" /></Link>
+                            <Link href="#" aria-label="Facebook"><SocialIcons.Facebook className="h-6 w-6 text-muted-foreground hover:text-primary" /></Link>
+                            <Link href="#" aria-label="GitHub"><SocialIcons.Github className="h-6 w-6 text-muted-foreground hover:text-primary" /></Link>
+                             <Link href="#" aria-label="TikTok"><SocialIcons.TikTok className="h-6 w-6 text-muted-foreground hover:text-primary"/></Link>
                         </div>
                     </div>
                 </SheetContent>

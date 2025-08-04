@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search } from 'lucide-react';
+import { Search, Code, Newspaper, User } from 'lucide-react';
 import type { BlogPost } from '@/lib/data';
 import { SocialIcons } from '@/components/social-icons';
 import Image from 'next/image';
@@ -24,6 +24,12 @@ const socialNetworks = [
   { name: 'Pinterest', icon: <SocialIcons.Pinterest />, url: '#' },
   { name: 'Linkedin', icon: <SocialIcons.Linkedin />, url: '#' },
 ];
+
+const categoryIcons = {
+    'Tech': <Code className="h-6 w-6 text-accent-foreground" />,
+    'Current Affairs': <Newspaper className="h-6 w-6 text-accent-foreground" />,
+    'Personal': <User className="h-6 w-6 text-accent-foreground" />
+} as const;
 
 
 export default function BlogSidebar({
@@ -55,8 +61,8 @@ export default function BlogSidebar({
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-3">
           {socialNetworks.map((network) => (
-            <Link key={network.name} href={network.url} className="flex items-center gap-3 rounded-lg bg-secondary/70 p-3 transition-transform duration-300 hover:scale-105 hover:shadow-lg">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white">
+            <Link key={network.name} href={network.url} className="flex items-center gap-3 rounded-lg bg-secondary/70 p-3 transition-transform duration-300 hover:scale-105 hover:shadow-lg dark:bg-secondary/20">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/70">
                   {network.icon}
                 </div>
                 <span className="font-semibold text-sm">{network.name}</span>
@@ -70,43 +76,27 @@ export default function BlogSidebar({
           <CardTitle className="font-headline">Categories</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {categories.map((category, index) => (
+          {(categories as Array<keyof typeof categoryIcons>).map((category) => (
              <Link href={`/blog?category=${category}`} key={category}>
                 <div className="relative overflow-hidden rounded-lg group cursor-pointer shadow-md hover:shadow-xl transition-all duration-300">
-                    <Image 
-                        src={`https://placehold.co/400x150.png`} 
-                        alt={category} 
-                        width={400} 
-                        height={150} 
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                        data-ai-hint="abstract background"
-                    />
-                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors duration-300"/>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="bg-white/90 backdrop-blur-sm text-foreground rounded-lg px-6 py-3 flex items-center gap-3">
-                           <Badge className={`bg-pink-500`}>{index + 1}</Badge>
-                            <span className="font-bold text-lg">{category}</span>
-                        </div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 dark:from-primary/10 dark:to-accent/10 group-hover:from-primary/30 group-hover:to-accent/30 transition-all duration-300" />
+                    <div className="p-4 flex items-center gap-4">
+                       <div className="p-3 rounded-lg bg-accent/80 dark:bg-accent/50">
+                         {categoryIcons[category]}
+                       </div>
+                       <span className="font-bold text-lg">{category}</span>
                     </div>
                 </div>
              </Link>
           ))}
            <Link href="/blog">
                 <div className="relative overflow-hidden rounded-lg group cursor-pointer shadow-md hover:shadow-xl transition-all duration-300">
-                    <Image 
-                        src={`https://placehold.co/400x150.png`} 
-                        alt="All" 
-                        width={400} 
-                        height={150} 
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                        data-ai-hint="abstract background"
-                    />
-                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors duration-300"/>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="bg-white/90 backdrop-blur-sm text-foreground rounded-lg px-6 py-3 flex items-center gap-3">
-                           <Badge>{categories.length + 1}</Badge>
-                            <span className="font-bold text-lg">All</span>
+                    <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-muted/20 dark:from-secondary/10 dark:to-muted/10 group-hover:from-secondary/30 group-hover:to-muted/30 transition-all duration-300" />
+                     <div className="p-4 flex items-center gap-4">
+                        <div className="p-3 rounded-lg bg-muted/80 dark:bg-muted/50">
+                           <Newspaper className="h-6 w-6 text-muted-foreground" />
                         </div>
+                        <span className="font-bold text-lg">All Categories</span>
                     </div>
                 </div>
              </Link>
