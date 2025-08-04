@@ -18,29 +18,24 @@ export async function GET() {
 // POST a new blog post
 export async function POST(request: Request) {
   try {
-    const post: Omit<BlogPost, 'slug'> = await request.json();
+    const post: Omit<BlogPost, 'id'> = await request.json();
     
     // Basic validation
-    if (!post.title || !post.content) {
+    if (!post.title || !post.content || !post.slug) {
         return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    const slug = post.title.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
-
     // Check if slug already exists
     const postsCollection = collection(db, 'posts');
-    const q = query(postsCollection, where("slug", "==", slug));
+    const q = query(postsCollection, where("slug", "==", post.slug));
     const querySnapshot = await getDocs(q);
     if (!querySnapshot.empty) {
-        return NextResponse.json({ message: 'Slug already exists' }, { status: 409 });
+        return NextResponse.json({ message: 'Slug already exists, please choose a different title.' }, { status: 409 });
     }
 
-    const docRef = await addDoc(postsCollection, {
-      ...post,
-      slug,
-    });
+    const docRef = await addDoc(postsCollection, post);
     
-    return NextResponse.json({ id: docRef.id, ...post, slug }, { status: 201 });
+    return NextResponse.json({ id: docRef.id, ...post }, { status: 201 });
 
   } catch (error) {
     return NextResponse.json({ message: 'Error creating post', error }, { status: 500 });
