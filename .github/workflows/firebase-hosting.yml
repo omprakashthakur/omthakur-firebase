@@ -16,6 +16,7 @@
 # 7.  In your GitHub repository, go to Settings > Secrets and variables > Actions.
 # 8.  Create a new secret named `GCP_PROJECT_ID`.
 # 9.  Use your project ID as the value for the secret.
+#10. Added
 
 name: Deploy to Firebase Hosting
 
