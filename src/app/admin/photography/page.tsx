@@ -22,7 +22,7 @@ export default function AdminPhotographyPage() {
   async function fetchPhotos() {
     setLoading(true);
     try {
-      const { data, error } = await supabase.from('photography').select('*').order('created_at', { ascending: false });
+      const { data, error } = await supabase.from('photography').select('*');
       if (error) throw error;
       setPhotos(data as Photography[]);
     } catch (error: any) {

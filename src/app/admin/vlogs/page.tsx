@@ -24,7 +24,7 @@ export default function AdminVlogsPage() {
   async function fetchVlogs() {
     setLoading(true);
     try {
-      const { data, error } = await supabase.from('vlogs').select('*').order('created_at', { ascending: false });
+      const { data, error } = await supabase.from('vlogs').select('*');
       if (error) throw error;
       setVlogs(data as Vlog[]);
     } catch (error: any) {
