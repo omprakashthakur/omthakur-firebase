@@ -13,8 +13,9 @@ import ShareButtons from '@/components/share-buttons';
 import CommentSection from '@/components/comment-section';
 import { categories as allCategories, allTags as allPostTags } from '@/lib/data';
 import { useEffect, useState } from 'react';
-import { getPost, getPosts } from '@/lib/supabaseClient';
 import { Spinner } from '@/components/ui/spinner';
+import { collection, query, where, getDocs, limit, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 
 export default function BlogPostPage() {
@@ -28,12 +29,20 @@ export default function BlogPostPage() {
     if (!slug) return;
     const fetchData = async () => {
       setLoading(true);
-      const postData = await getPost(slug);
-      setPost(postData);
 
-      const allPosts = await getPosts();
-      const recent = allPosts.filter(p => p.slug !== slug).slice(0, 5);
-      setRecentPosts(recent);
+      const postsCollection = collection(db, 'posts');
+      const postQuery = query(postsCollection, where('slug', '==', slug));
+      const postSnapshot = await getDocs(postQuery);
+
+      if (!postSnapshot.empty) {
+        const postDoc = postSnapshot.docs[0];
+        setPost({ ...postDoc.data(), id: postDoc.id } as BlogPost);
+
+        const recentPostsQuery = query(postsCollection, where('slug', '!=', slug), orderBy('slug'), orderBy('date', 'desc'), limit(5));
+        const recentPostsSnapshot = await getDocs(recentPostsQuery);
+        const recent = recentPostsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[];
+        setRecentPosts(recent);
+      }
       
       setLoading(false);
     }

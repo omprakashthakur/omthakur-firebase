@@ -12,7 +12,8 @@ import BlogSidebar from '@/components/blog-sidebar';
 import { categories, allTags } from '@/lib/data';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getPosts } from '@/lib/supabaseClient';
+import { collection, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 const POSTS_PER_PAGE = 6;
 
@@ -27,19 +28,30 @@ export default function BlogPage() {
   
   useEffect(() => {
     const fetchData = async () => {
-      const allPosts = await getPosts();
+      const postsCollection = collection(db, 'posts');
+      
+      let postsQuery = query(postsCollection, orderBy('date', 'desc'));
+
+      if (selectedCategory) {
+        postsQuery = query(postsQuery, where('category', '==', selectedCategory));
+      }
+      if (selectedTag) {
+        postsQuery = query(postsQuery, where('tags', 'array-contains', selectedTag));
+      }
+
+      const postsSnapshot = await getDocs(postsQuery);
+      const allPosts = postsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[];
       setPosts(allPosts);
-      setRecentPosts(allPosts.slice(0, 5));
+
+      const recentPostsQuery = query(collection(db, 'posts'), orderBy('date', 'desc'), limit(5));
+      const recentPostsSnapshot = await getDocs(recentPostsQuery);
+      setRecentPosts(recentPostsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[]);
     }
     fetchData();
-  }, []);
+  }, [selectedCategory, selectedTag]);
 
-  const filteredPosts = posts
-    .filter(post => !selectedCategory || post.category === selectedCategory)
-    .filter(post => !selectedTag || (post.tags && post.tags.includes(selectedTag)));
-  
-  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
-  const paginatedPosts = filteredPosts.slice(
+  const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
+  const paginatedPosts = posts.slice(
     (currentPage - 1) * POSTS_PER_PAGE,
     currentPage * POSTS_PER_PAGE
   );

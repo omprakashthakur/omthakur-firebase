@@ -16,7 +16,8 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useEffect, useState } from "react";
-import { getPosts, getVlogs, getPhotos } from "@/lib/supabaseClient";
+import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 
 export default function Home() {
@@ -26,12 +27,17 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-        const posts = await getPosts();
-        setRecentPosts(posts.slice(0, 3));
-        const vlogs = await getVlogs();
-        setFeaturedVlogs(vlogs.slice(0, 3));
-        const photos = await getPhotos();
-        setPhotoGallery(photos.slice(0, 6));
+        const postsQuery = query(collection(db, 'posts'), orderBy('date', 'desc'), limit(3));
+        const postsSnapshot = await getDocs(postsQuery);
+        setRecentPosts(postsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[]);
+
+        const vlogsQuery = query(collection(db, 'vlogs'), limit(3));
+        const vlogsSnapshot = await getDocs(vlogsQuery);
+        setFeaturedVlogs(vlogsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Vlog[]);
+
+        const photosQuery = query(collection(db, 'photography'), limit(6));
+        const photosSnapshot = await getDocs(photosQuery);
+        setPhotoGallery(photosSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Photography[]);
     };
     fetchData();
   }, []);
@@ -133,8 +139,8 @@ export default function Home() {
           <h2 className="text-3xl md:text-4xl font-headline font-bold text-center mb-12">Featured Vlogs</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featuredVlogs.map((vlog) => (
-              <Card key={vlog.title} className="group overflow-hidden shadow-lg relative">
-                <Link href="/vlog" className="block relative h-60">
+              <Card key={vlog.id} className="group overflow-hidden shadow-lg relative">
+                <Link href={vlog.url} target="_blank" rel="noopener noreferrer" className="block relative h-60">
                   <Image
                     src={vlog.thumbnail}
                     alt={vlog.title}

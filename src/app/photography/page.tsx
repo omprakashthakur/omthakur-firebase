@@ -9,8 +9,8 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Download, X } from 'lucide-react';
 import Link from 'next/link';
-import { getPhotos } from '@/lib/supabaseClient';
-
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function PhotographyPage() {
   const [photos, setPhotos] = useState<Photography[]>([]);
@@ -18,7 +18,9 @@ export default function PhotographyPage() {
 
   useEffect(() => {
     const fetchPhotos = async () => {
-        const photoData = await getPhotos();
+        const photosCollection = collection(db, 'photography');
+        const photosSnapshot = await getDocs(photosCollection);
+        const photoData = photosSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Photography[];
         setPhotos(photoData);
     }
     fetchPhotos();
