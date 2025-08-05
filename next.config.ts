@@ -25,14 +25,4 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'images.unsplash.com',
-        port: '',
-        pathname: '/**',
-      },
-    ],
-    unoptimized: true,
-  },
-  output: 'export',
-};
-
-export default nextConfig;
+        hostname: '

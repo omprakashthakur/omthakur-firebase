@@ -221,6 +221,3 @@ export default function PostForm({ post }: PostFormProps) {
           </form>
         </Form>
       </CardContent>
-    </Card>
-  );
-}

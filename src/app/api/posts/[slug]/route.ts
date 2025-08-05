@@ -1,80 +1,51 @@
+
 import { NextResponse } from 'next/server';
-import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import type { BlogPost } from '@/lib/data';
-
-async function getPostDocumentId(slug: string): Promise<string | null> {
-    const postsCollection = collection(db, 'posts');
-    const q = query(postsCollection, where("slug", "==", slug));
-    const querySnapshot = await getDocs(q);
-    if (querySnapshot.empty) {
-        return null;
-    }
-    return querySnapshot.docs[0].id;
-}
+import { getPost, updatePost, deletePost } from '@/lib/supabaseClient';
 
 
-// GET a single blog post by slug
 export async function GET(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
   try {
-    const docId = await getPostDocumentId(params.slug);
-    if (!docId) {
-        return NextResponse.json({ message: 'Post not found' }, { status: 404 });
+    const post = await getPost(params.slug);
+    if (!post) {
+      return NextResponse.json({ message: 'Post not found' }, { status: 404 });
     }
-    const postDoc = await getDoc(doc(db, 'posts', docId));
-    if (!postDoc.exists()) {
-        return NextResponse.json({ message: 'Post not found' }, { status: 404 });
-    }
-    return NextResponse.json({ ...postDoc.data(), id: postDoc.id });
+    return NextResponse.json(post);
   } catch (error) {
-    return NextResponse.json({ message: 'Error fetching post', error }, { status: 500 });
+     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ message: 'Error fetching post', error: errorMessage }, { status: 500 });
   }
 }
 
-// PUT (update) a blog post by slug
 export async function PUT(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
   try {
-    const updatedPostData: Partial<Omit<BlogPost, 'slug'>> = await request.json();
-    const docId = await getPostDocumentId(params.slug);
-    
-    if (!docId) {
+    const updatedData = await request.json();
+    const updatedPost = await updatePost(params.slug, updatedData);
+     if (!updatedPost) {
       return NextResponse.json({ message: 'Post not found' }, { status: 404 });
     }
-
-    const postRef = doc(db, 'posts', docId);
-    await updateDoc(postRef, updatedPostData);
-
-    const updatedDoc = await getDoc(postRef);
-
-    return NextResponse.json({ ...updatedDoc.data(), id: updatedDoc.id });
+    return NextResponse.json(updatedPost);
   } catch (error) {
-    let errorMessage = 'Error updating post';
-    if (error instanceof Error) {
-        errorMessage = error.message;
-    }
-    return NextResponse.json({ message: errorMessage }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ message: 'Error updating post', error: errorMessage }, { status: 500 });
   }
 }
 
-// DELETE a blog post by slug
 export async function DELETE(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
   try {
-    const docId = await getPostDocumentId(params.slug);
-    if (!docId) {
-        return NextResponse.json({ message: 'Post not found' }, { status: 404 });
+    const success = await deletePost(params.slug);
+    if (!success) {
+       return NextResponse.json({ message: 'Post not found or could not be deleted' }, { status: 404 });
     }
-    await deleteDoc(doc(db, 'posts', docId));
     return NextResponse.json({ message: 'Post deleted successfully' });
   } catch (error) {
-    return NextResponse.json({ message: 'Error deleting post' }, { status: 500 });
-  }
-}
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    

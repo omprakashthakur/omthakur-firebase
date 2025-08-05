@@ -2,25 +2,22 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { BlogPost, Vlog, Photography } from '@/lib/data';
 
-// IMPORTANT: These are placeholder values.
-// You need to create a Supabase project and replace them with your actual keys.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'YOUR_SUPABASE_URL';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
+// This is the public client, safe for client-side fetching
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 let supabase: SupabaseClient | null = null;
-
-if (supabaseUrl !== 'YOUR_SUPABASE_URL' && supabaseAnonKey !== 'YOUR_SUPABASE_ANON_KEY') {
+if (supabaseUrl && supabaseAnonKey) {
   supabase = createClient(supabaseUrl, supabaseAnonKey);
 } else {
-  console.warn('Supabase credentials are not set. Please update your environment variables. App will run with empty data.');
+  console.warn('Supabase public credentials are not set. Client-side fetching will be disabled.');
 }
 
-
-// Helper functions to fetch data
+// Helper functions for PUBLIC data fetching (used by pages)
 
 export const getPosts = async (): Promise<BlogPost[]> => {
     if (!supabase) return [];
-    const { data, error } = await supabase.from('posts').select('*');
+    const { data, error } = await supabase.from('posts').select('*').order('date', { ascending: false });
     if (error) {
         console.error('Error fetching posts:', error);
         return [];
@@ -57,3 +54,42 @@ export const getPhotos = async (): Promise<Photography[]> => {
     }
     return data as Photography[];
 }
+
+// Admin functions for server-side CUD operations
+// This uses the service role key for elevated privileges.
+// It should ONLY be used in server-side code (API routes).
+
+let supabaseAdmin: SupabaseClient | null = null;
+if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    supabaseAdmin = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+        auth: {
+            autoRefreshToken: false,
+            persistSession: false
+        }
+    });
+} else {
+    console.warn('Supabase service role key is not set. Admin operations will fail.');
+}
+
+export const createPost = async (postData: Partial<BlogPost>): Promise<BlogPost> => {
+    if (!supabaseAdmin) throw new Error('Admin client not initialized.');
+    const { data, error } = await supabaseAdmin.from('posts').insert(postData).select().single();
+    if (error) throw error;
+    return data;
+};
+
+export const updatePost = async (slug: string, postData: Partial<BlogPost>): Promise<BlogPost | null> => {
+    if (!supabaseAdmin) throw new Error('Admin client not initialized.');
+    const { data, error } = await supabaseAdmin.from('posts').update(postData).eq('slug', slug).select().single();
+    if (error) throw error;
+    return data;
+};
+
+export const deletePost = async (slug: string): Promise<boolean> => {
+    if (!supabaseAdmin) throw new Error('Admin client not initialized.');
+    const { error } = await supabaseAdmin.from('posts').delete().eq('slug', slug);
+    if (error) throw error;
+    return true;
+};
+
+// You can add similar create, update, delete functions for Vlogs and
