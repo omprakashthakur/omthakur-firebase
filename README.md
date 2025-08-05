@@ -1,1 +1,1 @@
-# Om Thakur - Personal Portfolio and Blog
+# Om Thakur - Personal Portfolio.
