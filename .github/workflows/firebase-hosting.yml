@@ -15,9 +15,11 @@
 # 5.  Create a new secret named `FIREBASE_SERVICE_ACCOUNT_OMTHAKURIO`.
 # 6.  Paste the entire content of the downloaded JSON key file as the value for the secret.
 # 7.  In your GitHub repository, go to Settings > Secrets and variables > Actions.
-# 8.  Create a new secret named `GCP_PROJECT_ID`.
-# 9.  Use your project ID as the value for the secret.
-#10. Added
+# 8.  Create the following secrets:
+#    - `GCP_PROJECT_ID` with your Firebase Project ID.
+#    - `NEXT_PUBLIC_SUPABASE_URL` with your Supabase URL.
+#    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase Anon Key.
+
 
 name: Deploy to Firebase Hosting
 
@@ -36,6 +38,9 @@ jobs:
           node-version: 20
       - run: npm install
       - run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
