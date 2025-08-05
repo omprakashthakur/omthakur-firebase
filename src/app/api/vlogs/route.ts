@@ -25,10 +25,9 @@ export async function POST(request: Request) {
         return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
     
-    // In a real app, you'd generate a thumbnail from the URL. Here we use a placeholder.
     const newVlog = {
         ...vlogData,
-        thumbnail: `https://placehold.co/600x400.png?text=${encodeURIComponent(vlogData.title)}`, // Placeholder
+        thumbnail: `https://placehold.co/600x400.png?text=${encodeURIComponent(vlogData.title)}`,
     };
 
     const docRef = await addDoc(collection(db, 'vlogs'), newVlog);

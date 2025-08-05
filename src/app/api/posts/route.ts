@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { getPosts, createPost } from '@/lib/supabaseClient';
+import { getPosts, createPostAdmin } from '@/lib/supabaseClient';
 import type { BlogPost } from '@/lib/data';
 
 export async function GET() {
@@ -16,7 +16,8 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const postData: BlogPost = await request.json();
-    const newPost = await createPost(postData);
+    // Use the admin version of the function for creation
+    const newPost = await createPostAdmin(postData);
     return NextResponse.json(newPost, { status: 201 });
   } catch (error) {
      const errorMessage = error instanceof Error ? error.message : 'Unknown error';

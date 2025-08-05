@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -10,6 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { MoreHorizontal, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { BlogPost } from '@/lib/data';
+import { Spinner } from '@/components/ui/spinner';
 
 export default function AdminDashboardPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -17,6 +19,7 @@ export default function AdminDashboardPage() {
   const { toast } = useToast();
 
   async function fetchPosts() {
+    setLoading(true);
     try {
       const response = await fetch('/api/posts');
       if (!response.ok) throw new Error('Failed to fetch posts');
@@ -58,7 +61,11 @@ export default function AdminDashboardPage() {
   };
   
   if (loading) {
-      return <div>Loading...</div>
+      return (
+        <div className="flex h-[50vh] w-full items-center justify-center">
+            <Spinner />
+        </div>
+      )
   }
 
   return (

@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { getPost, updatePost, deletePost } from '@/lib/supabaseClient';
+import { getPost, updatePostAdmin, deletePostAdmin } from '@/lib/supabaseClient';
 
 
 export async function GET(
@@ -25,7 +25,7 @@ export async function PUT(
 ) {
   try {
     const updatedData = await request.json();
-    const updatedPost = await updatePost(params.slug, updatedData);
+    const updatedPost = await updatePostAdmin(params.slug, updatedData);
      if (!updatedPost) {
       return NextResponse.json({ message: 'Post not found' }, { status: 404 });
     }
@@ -41,7 +41,7 @@ export async function DELETE(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const success = await deletePost(params.slug);
+    const success = await deletePostAdmin(params.slug);
     if (!success) {
        return NextResponse.json({ message: 'Post not found or could not be deleted' }, { status: 404 });
     }

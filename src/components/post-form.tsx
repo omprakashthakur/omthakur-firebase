@@ -22,6 +22,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { categories } from '@/lib/data';
 import type { BlogPost } from '@/lib/data';
+import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
@@ -53,6 +54,8 @@ export default function PostForm({ post }: PostFormProps) {
     },
   });
 
+  const { isSubmitting } = form.formState;
+
   const slugify = (str: string) =>
     str
       .toLowerCase()
@@ -72,10 +75,9 @@ export default function PostForm({ post }: PostFormProps) {
       tags: values.tags.split(',').map(tag => tag.trim()),
       author: 'Om Thakur', // This would typically come from user session
       date: post?.date || new Date().toISOString(),
-      image: values.image || 'https://placehold.co/1200x600.png', // Default placeholder
+      image: values.image || 'https://placehold.co/1200x600.png',
     };
     
-    // In edit mode, we only send the changed values
     const payload = isEditing ? {
         title: values.title,
         excerpt: values.excerpt,
@@ -217,7 +219,10 @@ export default function PostForm({ post }: PostFormProps) {
                 )}
               />
              </div>
-            <Button type="submit">{isEditing ? 'Update Post' : 'Create Post'}</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isEditing ? 'Update Post' : 'Create Post'}
+            </Button>
           </form>
         </Form>
       </CardContent>
