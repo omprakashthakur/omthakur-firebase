@@ -30,7 +30,7 @@ export default function AboutPage() {
             Software Engineer | Tech Content Writer | Traveler | Vlogger ▶️ | Photographer 📸
           </h3>
           <p className="text-muted-foreground leading-relaxed">
-            Welcome to my digital space! I’m Om Thakur, a passionate software engineer with a knack for simplifying complex tech. I share real-world tutorials, project experiences, and current affairs in tech to help others grow. I’m also an avid traveler and content creator, capturing stories through my lens and sharing moments from around the world. Here, you’ll find a blend of technology, videography, photography, and personal insights—all curated with purpose. Let’s connect, learn, and grow together.
+            Welcome to my digital space!! I’m Om Thakur, a passionate software engineer with a knack for simplifying complex tech. I share real-world tutorials, project experiences, and current affairs in tech to help others grow. I’m also an avid traveler and content creator, capturing stories through my lens and sharing moments from around the world. Here, you’ll find a blend of technology, videography, photography, and personal insights—all curated with purpose. Let’s connect, learn, and grow together.
           </p>
         </div>
       </div>
