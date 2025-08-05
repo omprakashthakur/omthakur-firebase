@@ -1,33 +1,22 @@
 
-# This file is a template, and might need editing to fit your project.
-#
-# This workflow is triggered on pushes to the repository. It builds the
-# Next.js app and deploys it to Firebase Hosting.
-#
-# To use this workflow, you need to:
-#
-# 1.  Create a new GitHub repository for your project.
-# 2.  Push this code to your new repository.
-# 3.  Create a Firebase service account and download the JSON key file.
-#     - Go to your Firebase project settings > Service accounts.
-#     - Click "Generate new private key".
-# 4.  In your GitHub repository, go to Settings > Secrets and variables > Actions.
-# 5.  Create a new secret named `FIREBASE_SERVICE_ACCOUNT_OMTHAKURIO`.
-# 6.  Paste the entire content of the downloaded JSON key file as the value for the secret.
-# 7.  In your GitHub repository, go to Settings > Secrets and variables > Actions.
-# 8.  Create a secret for `GCP_PROJECT_ID` with your Firebase Project ID.
+# Firebase Hosting Deployment for Static Content
+# This workflow builds your Next.js app in static export mode and deploys 
+# only the static content to Firebase Hosting, while keeping dynamic content on Vercel.
 
-
-name: Deploy to Firebase Hosting
+name: Deploy to Firebase Hosting (Static Only)
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    env:
+      VERCEL_PROJECT_ID: prj_MG7wWVlmNL1uJ8C63f07xh3U4xjb
+      
     steps:
       - uses: actions/checkout@v4
       - run: echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" > .env
@@ -35,13 +24,46 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install
-      - run: npm run build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      # Modify next.config.js to enable static export
+      - name: Configure static export in Next.js
+        run: |
+          echo 'Adding static export to next.config.ts'
+          sed -i 's/const nextConfig: NextConfig = {/const nextConfig: NextConfig = {\n  output: "export",/' next.config.ts
+      
+      - name: Build static version
+        run: npm run build
+        env:
+          NEXT_PUBLIC_VERCEL_PROJECT_ID: ${{ env.VERCEL_PROJECT_ID }}
+      
+      # Create a .firebaserc file to avoid issues with project selection
+      - name: Setup Firebase project
+        run: |
+          echo '{
+            "projects": {
+              "default": "${{ secrets.GCP_PROJECT_ID }}"
+            }
+          }' > .firebaserc
+      
+      # Deploy only the static hosting content (no functions)
+      - name: Deploy to Firebase Hosting
+        id: deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_OMTHAKURIO }}'
           projectId: '${{ secrets.GCP_PROJECT_ID }}'
           channelId: live
-        env:
-          FIREBASE_CLI_EXPERIMENTS: webframeworks
+          entryPoint: '.'   # Use the root directory as entry point
+          
+      # Post deployment notification
+      - name: Create Deployment Status
+        if: success()
+        run: |
+          echo "✅ Firebase Hosting deployment complete!"
+          echo "🔗 Site URL: ${{ steps.deploy.outputs.details_url || format('https://{0}.web.app', secrets.GCP_PROJECT_ID) }}"
+          echo "📊 Vercel Project ID: ${{ env.VERCEL_PROJECT_ID }}"

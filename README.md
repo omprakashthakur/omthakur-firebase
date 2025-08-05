@@ -61,14 +61,49 @@ npm run dev
 
 ## Deployment
 
-### Firebase Deployment
+This project uses a hybrid deployment strategy:
+
+### Primary Deployment: Vercel
+The primary deployment for all server-side features is on Vercel:
+
+1. Connect your GitHub repository to Vercel
+2. Configure the environment variables in Vercel
+3. Deploy automatically when pushing to the main branch
+
+**Vercel Project ID:** `prj_MG7wWVlmNL1uJ8C63f07xh3U4xjb`
+
+You can deploy manually to Vercel with:
 ```bash
-npm run build
-firebase deploy
+npm run vercel:deploy
 ```
 
-### Vercel Deployment
-Connect your GitHub repository to Vercel for automatic deployments.
+### Secondary Deployment: Firebase Hosting
+Firebase Hosting is used for static content:
+
+```bash
+# For manual deployment
+npm run build
+firebase deploy --only hosting
+```
+
+The GitHub Action will automatically deploy static content to Firebase Hosting when pushing to the main branch.
+
+### Accessing the App
+- Vercel URL: https://yourapp.vercel.app
+- Firebase URL: https://yourapp.web.app
+
+## Resolving GitHub Actions Issues
+
+If you encounter GitHub Actions deployment issues related to missing APIs:
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Select your Firebase project
+3. Navigate to "APIs & Services" > "Library"
+4. Enable the following APIs:
+   - Cloud Build API (cloudbuild.googleapis.com)
+   - Artifact Registry API (artifactregistry.googleapis.com)
+
+If you don't need server-side features on Firebase, you can use the static-only deployment configuration provided in this repository.
 
 ## License
 MIT
