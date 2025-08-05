@@ -1,30 +1,36 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import PostForm from '@/components/post-form';
 import type { BlogPost } from '@/lib/data';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { Spinner } from '@/components/ui/spinner';
+
 
 export default function EditPostPage() {
   const params = useParams();
-  const slug = params.slug as string;
+  const id = params.slug as string; // The slug is now the Firestore document ID
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (slug) {
-      fetch(`/api/posts/${slug}`)
-        .then(res => res.json())
-        .then(data => {
-          setPost(data);
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
+    if (id) {
+        const fetchPost = async () => {
+            const postDoc = await getDoc(doc(db, 'posts', id));
+            if (postDoc.exists()) {
+                setPost({ ...postDoc.data(), id: postDoc.id } as BlogPost);
+            }
+            setLoading(false);
+        }
+        fetchPost().catch(() => setLoading(false));
     }
-  }, [slug]);
+  }, [id]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="flex h-[50vh] w-full items-center justify-center"><Spinner /></div>;
   }
   
   if (!post) {

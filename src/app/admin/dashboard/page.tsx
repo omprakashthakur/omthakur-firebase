@@ -12,6 +12,8 @@ import { MoreHorizontal, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { BlogPost } from '@/lib/data';
 import { Spinner } from '@/components/ui/spinner';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function AdminDashboardPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -21,10 +23,10 @@ export default function AdminDashboardPage() {
   async function fetchPosts() {
     setLoading(true);
     try {
-      const response = await fetch('/api/posts');
-      if (!response.ok) throw new Error('Failed to fetch posts');
-      const data = await response.json();
-      setPosts(data);
+      const postsCollection = collection(db, 'posts');
+      const postsSnapshot = await getDocs(postsCollection);
+      const postsList = postsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[];
+      setPosts(postsList);
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -40,12 +42,11 @@ export default function AdminDashboardPage() {
     fetchPosts();
   }, []);
 
-  const handleDelete = async (slug: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this post?')) return;
 
     try {
-      const response = await fetch(`/api/posts/${slug}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Failed to delete post');
+      await deleteDoc(doc(db, 'posts', id));
       toast({
         title: 'Success',
         description: 'Post deleted successfully.',
@@ -96,7 +97,7 @@ export default function AdminDashboardPage() {
             </TableHeader>
             <TableBody>
               {posts.map((post) => (
-                <TableRow key={post.slug}>
+                <TableRow key={post.id}>
                   <TableCell className="font-medium">{post.title}</TableCell>
                   <TableCell>
                     <Badge variant="secondary">{post.category}</Badge>
@@ -112,12 +113,12 @@ export default function AdminDashboardPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
-                          <Link href={`/admin/posts/${post.slug}/edit`}>
+                          <Link href={`/admin/posts/${post.id}/edit`}>
                             <Edit className="mr-2 h-4 w-4" />
                             Edit
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(post.slug)} className="text-destructive">
+                        <DropdownMenuItem onClick={() => handleDelete(post.id)} className="text-destructive">
                            <Trash2 className="mr-2 h-4 w-4" />
                            Delete
                         </DropdownMenuItem>

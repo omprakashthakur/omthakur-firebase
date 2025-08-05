@@ -23,6 +23,8 @@ import { useToast } from '@/hooks/use-toast';
 import { categories } from '@/lib/data';
 import type { BlogPost } from '@/lib/data';
 import { Loader2 } from 'lucide-react';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
@@ -66,38 +68,23 @@ export default function PostForm({ post }: PostFormProps) {
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const method = isEditing ? 'PUT' : 'POST';
-    const url = isEditing ? `/api/posts/${post.slug}` : '/api/posts';
-
     const postData = {
       ...values,
-      slug: isEditing ? post.slug : slugify(values.title),
+      slug: slugify(values.title),
       tags: values.tags.split(',').map(tag => tag.trim()),
       author: 'Om Thakur', // This would typically come from user session
-      date: post?.date || new Date().toISOString(),
-      image: values.image || 'https://placehold.co/1200x600.png',
+      date: isEditing ? post.date : new Date().toISOString(),
+      image: values.image || `https://placehold.co/1200x600.png?text=${encodeURIComponent(values.title)}`,
     };
-    
-    const payload = isEditing ? {
-        title: values.title,
-        excerpt: values.excerpt,
-        content: values.content,
-        category: values.category,
-        tags: values.tags.split(',').map(tag => tag.trim()),
-        image: values.image,
-    } : postData;
 
     try {
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Something went wrong');
-      }
+        if(isEditing) {
+            const postRef = doc(db, 'posts', post.id);
+            await updateDoc(postRef, postData);
+        } else {
+            await addDoc(collection(db, 'posts'), postData);
+        }
+      
 
       toast({
         title: `Post ${isEditing ? 'updated' : 'created'}`,
