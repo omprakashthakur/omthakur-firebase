@@ -23,6 +23,8 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-      {
-        protocol: 'https',
-        hostname: '
+    ],
+  },
+};
+
+export default nextConfig;
