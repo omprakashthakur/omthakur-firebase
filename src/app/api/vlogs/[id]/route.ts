@@ -21,7 +21,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
-    const { error } = await supabase.from('vlogs').delete().eq('id', id);
+    const { error } = await supabase.from('vlogs').delete().eq('id', id).select();
 
     if (error) {
       throw new Error(error.message);

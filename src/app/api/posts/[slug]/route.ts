@@ -41,7 +41,7 @@ export async function PUT(request: Request, { params }: { params: { slug: string
 export async function DELETE(request: Request, { params }: { params: { slug: string } }) {
   try {
     const { slug } = params;
-    const { error } = await supabase.from('posts').delete().eq('id', slug);
+    const { error } = await supabase.from('posts').delete().eq('id', slug).select();
 
     if (error) {
       throw new Error(error.message);
