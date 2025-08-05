@@ -12,6 +12,10 @@ import { MoreHorizontal, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { Vlog } from '@/lib/data';
 import Image from 'next/image';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { Spinner } from '@/components/ui/spinner';
+
 
 export default function AdminVlogsPage() {
   const [vlogs, setVlogs] = useState<Vlog[]>([]);
@@ -19,11 +23,12 @@ export default function AdminVlogsPage() {
   const { toast } = useToast();
 
   async function fetchVlogs() {
+    setLoading(true);
     try {
-      const response = await fetch('/api/vlogs');
-      if (!response.ok) throw new Error('Failed to fetch vlogs');
-      const data = await response.json();
-      setVlogs(data);
+      const vlogsCollection = collection(db, 'vlogs');
+      const vlogsSnapshot = await getDocs(vlogsCollection);
+      const vlogsList = vlogsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Vlog[];
+      setVlogs(vlogsList);
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -37,14 +42,13 @@ export default function AdminVlogsPage() {
 
   useEffect(() => {
     fetchVlogs();
-  }, []);
+  }, [toast]);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this vlog?')) return;
 
     try {
-      const response = await fetch(`/api/vlogs/${id}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Failed to delete vlog');
+      await deleteDoc(doc(db, 'vlogs', id));
       toast({
         title: 'Success',
         description: 'Vlog deleted successfully.',
@@ -60,7 +64,7 @@ export default function AdminVlogsPage() {
   };
   
   if (loading) {
-      return <div>Loading...</div>
+      return <div className="flex h-[50vh] w-full items-center justify-center"><Spinner /></div>
   }
 
   return (

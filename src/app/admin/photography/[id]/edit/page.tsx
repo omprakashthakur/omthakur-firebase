@@ -5,6 +5,9 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import PhotographyForm from '@/components/photography-form';
 import type { Photography } from '@/lib/data';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { Spinner } from '@/components/ui/spinner';
 
 export default function EditPhotographyPage() {
   const params = useParams();
@@ -14,18 +17,19 @@ export default function EditPhotographyPage() {
 
   useEffect(() => {
     if (id) {
-      fetch(`/api/photography/${id}`)
-        .then(res => res.json())
-        .then(data => {
-          setPhoto(data);
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
+        const fetchPhoto = async () => {
+            const photoDoc = await getDoc(doc(db, 'photography', id));
+            if (photoDoc.exists()) {
+                setPhoto({ ...photoDoc.data(), id: photoDoc.id } as Photography);
+            }
+            setLoading(false);
+        }
+        fetchPhoto().catch(() => setLoading(false));
     }
   }, [id]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="flex h-[50vh] w-full items-center justify-center"><Spinner /></div>;
   }
   
   if (!photo) {

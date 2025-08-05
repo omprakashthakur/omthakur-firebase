@@ -11,6 +11,9 @@ import { MoreHorizontal, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { Photography } from '@/lib/data';
 import Image from 'next/image';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { Spinner } from '@/components/ui/spinner';
 
 export default function AdminPhotographyPage() {
   const [photos, setPhotos] = useState<Photography[]>([]);
@@ -18,11 +21,12 @@ export default function AdminPhotographyPage() {
   const { toast } = useToast();
 
   async function fetchPhotos() {
+    setLoading(true);
     try {
-      const response = await fetch('/api/photography');
-      if (!response.ok) throw new Error('Failed to fetch photos');
-      const data = await response.json();
-      setPhotos(data);
+      const photosCollection = collection(db, 'photography');
+      const photosSnapshot = await getDocs(photosCollection);
+      const photosList = photosSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Photography[];
+      setPhotos(photosList);
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -36,14 +40,13 @@ export default function AdminPhotographyPage() {
 
   useEffect(() => {
     fetchPhotos();
-  }, []);
+  }, [toast]);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this photo?')) return;
 
     try {
-      const response = await fetch(`/api/photography/${id}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Failed to delete photo');
+      await deleteDoc(doc(db, 'photography', id));
       toast({
         title: 'Success',
         description: 'Photo deleted successfully.',
@@ -59,7 +62,7 @@ export default function AdminPhotographyPage() {
   };
   
   if (loading) {
-      return <div>Loading...</div>
+      return <div className="flex h-[50vh] w-full items-center justify-center"><Spinner /></div>
   }
 
   return (
