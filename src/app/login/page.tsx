@@ -88,7 +88,7 @@ export default function LoginPage() {
               {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Login'}
             </Button>
             <Button variant="outline" className="w-full" asChild>
-                <Link href="/">Back to My Website</Link>
+                <Link href="/">Back to Website</Link>
             </Button>
           </form>
         </CardContent>
