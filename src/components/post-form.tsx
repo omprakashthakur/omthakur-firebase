@@ -140,7 +140,7 @@ export default function PostForm({ post }: PostFormProps) {
                         <FormLabel>Featured Image URL</FormLabel>
                         <FormControl>
                             <Input 
-                              placeholder="https://example.com/your-image.png"
+                              placeholder="https://placehold.co/1200x600.png"
                               {...field}
                             />
                         </FormControl>
@@ -221,3 +221,6 @@ export default function PostForm({ post }: PostFormProps) {
           </form>
         </Form>
       </CardContent>
+    </Card>
+  );
+}

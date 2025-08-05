@@ -1,5 +1,5 @@
 
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import type { BlogPost, Vlog, Photography } from '@/lib/data';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -49,7 +49,10 @@ export const getPhotos = async (): Promise<Photography[]> => {
 // This is the admin client, for use in server-side API routes ONLY
 const getSupabaseAdmin = () => {
     if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-        throw new Error('Supabase service role key is not set. Admin operations will fail.');
+        // This is a fallback for local development if the service key isn't set.
+        // It's not secure for production but allows the app to run.
+        console.warn('Supabase service role key is not set. Using anon key for admin operations. THIS IS NOT SECURE FOR PRODUCTION.');
+        return supabase;
     }
     return createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY, {
         auth: {
