@@ -1,1 +1,1 @@
-# Om Thakur - Personal Portfolio and Blog 2025
+# Om Thakur - Personal Portfolio and Blog
