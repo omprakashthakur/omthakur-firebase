@@ -5,9 +5,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import PhotographyForm from '@/components/photography-form';
 import type { Photography } from '@/lib/data';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { Spinner } from '@/components/ui/spinner';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function EditPhotographyPage() {
   const params = useParams();
@@ -18,13 +17,22 @@ export default function EditPhotographyPage() {
   useEffect(() => {
     if (id) {
         const fetchPhoto = async () => {
-            const photoDoc = await getDoc(doc(db, 'photography', id));
-            if (photoDoc.exists()) {
-                setPhoto({ ...photoDoc.data(), id: photoDoc.id } as Photography);
+            const { data, error } = await supabase
+                .from('photography')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error) {
+                console.error('Error fetching photo:', error);
+                setLoading(false);
+                return;
             }
+
+            setPhoto(data as Photography);
             setLoading(false);
         }
-        fetchPhoto().catch(() => setLoading(false));
+        fetchPhoto();
     }
   }, [id]);
 

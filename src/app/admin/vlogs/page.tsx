@@ -12,9 +12,8 @@ import { MoreHorizontal, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { Vlog } from '@/lib/data';
 import Image from 'next/image';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { Spinner } from '@/components/ui/spinner';
+import { supabase } from '@/lib/supabaseClient';
 
 
 export default function AdminVlogsPage() {
@@ -25,15 +24,14 @@ export default function AdminVlogsPage() {
   async function fetchVlogs() {
     setLoading(true);
     try {
-      const vlogsCollection = collection(db, 'vlogs');
-      const vlogsSnapshot = await getDocs(vlogsCollection);
-      const vlogsList = vlogsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Vlog[];
-      setVlogs(vlogsList);
-    } catch (error) {
+      const { data, error } = await supabase.from('vlogs').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      setVlogs(data as Vlog[]);
+    } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not fetch vlogs.',
+        description: 'Could not fetch vlogs: ' + error.message,
       });
     } finally {
       setLoading(false);
@@ -42,23 +40,27 @@ export default function AdminVlogsPage() {
 
   useEffect(() => {
     fetchVlogs();
-  }, [toast]);
+  }, []);
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this vlog?')) return;
 
     try {
-      await deleteDoc(doc(db, 'vlogs', id));
+      const response = await fetch(`/api/vlogs/${id}`, { method: 'DELETE' });
+       if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete vlog');
+      }
       toast({
         title: 'Success',
         description: 'Vlog deleted successfully.',
       });
       fetchVlogs(); // Refresh vlogs list
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not delete the vlog.',
+        description: error.message,
       });
     }
   };

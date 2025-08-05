@@ -12,8 +12,7 @@ import BlogSidebar from '@/components/blog-sidebar';
 import { categories, allTags } from '@/lib/data';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { collection, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { supabase } from '@/lib/supabaseClient';
 
 const POSTS_PER_PAGE = 6;
 
@@ -28,24 +27,25 @@ export default function BlogPage() {
   
   useEffect(() => {
     const fetchData = async () => {
-      const postsCollection = collection(db, 'posts');
-      
-      let postsQuery = query(postsCollection, orderBy('date', 'desc'));
+      let query = supabase.from('posts').select('*').order('date', { ascending: false });
 
       if (selectedCategory) {
-        postsQuery = query(postsQuery, where('category', '==', selectedCategory));
+        query = query.eq('category', selectedCategory);
       }
       if (selectedTag) {
-        postsQuery = query(postsQuery, where('tags', 'array-contains', selectedTag));
+        query = query.overlaps('tags', [selectedTag]);
       }
 
-      const postsSnapshot = await getDocs(postsQuery);
-      const allPosts = postsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[];
-      setPosts(allPosts);
+      const { data: allPosts, error } = await query;
 
-      const recentPostsQuery = query(collection(db, 'posts'), orderBy('date', 'desc'), limit(5));
-      const recentPostsSnapshot = await getDocs(recentPostsQuery);
-      setRecentPosts(recentPostsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[]);
+      if (error) {
+        console.error("Error fetching posts:", error);
+      } else {
+        setPosts(allPosts as BlogPost[]);
+      }
+
+      const { data: recent } = await supabase.from('posts').select('*').order('date', { ascending: false }).limit(5);
+      setRecentPosts(recent as BlogPost[]);
     }
     fetchData();
   }, [selectedCategory, selectedTag]);

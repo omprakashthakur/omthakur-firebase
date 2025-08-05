@@ -18,8 +18,6 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import type { Photography } from '@/lib/data';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
@@ -50,12 +48,21 @@ export default function PhotographyForm({ photo }: PhotographyFormProps) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      if (isEditing) {
-        const photoRef = doc(db, 'photography', photo.id);
-        await updateDoc(photoRef, values);
-      } else {
-        await addDoc(collection(db, 'photography'), values);
-      }
+        const method = isEditing ? 'PUT' : 'POST';
+        const url = isEditing ? `/api/photography/${photo.id}` : '/api/photography';
+
+        const response = await fetch(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(values)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Something went wrong');
+        }
 
       toast({
         title: `Photo ${isEditing ? 'updated' : 'added'}`,

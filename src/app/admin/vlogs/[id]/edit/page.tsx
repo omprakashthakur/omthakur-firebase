@@ -5,9 +5,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import VlogForm from '@/components/vlog-form';
 import type { Vlog } from '@/lib/data';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { Spinner } from '@/components/ui/spinner';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function EditVlogPage() {
   const params = useParams();
@@ -18,13 +17,22 @@ export default function EditVlogPage() {
   useEffect(() => {
     if (id) {
        const fetchVlog = async () => {
-            const vlogDoc = await getDoc(doc(db, 'vlogs', id));
-            if (vlogDoc.exists()) {
-                setVlog({ ...vlogDoc.data(), id: vlogDoc.id } as Vlog);
+            const { data, error } = await supabase
+                .from('vlogs')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error) {
+                console.error('Error fetching vlog:', error);
+                setLoading(false);
+                return;
             }
+            
+            setVlog(data as Vlog);
             setLoading(false);
        }
-       fetchVlog().catch(() => setLoading(false));
+       fetchVlog();
     }
   }, [id]);
 

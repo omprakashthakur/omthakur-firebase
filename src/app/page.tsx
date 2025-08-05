@@ -16,8 +16,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useEffect, useState } from "react";
-import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { supabase } from "@/lib/supabaseClient";
 
 
 export default function Home() {
@@ -27,17 +26,14 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-        const postsQuery = query(collection(db, 'posts'), orderBy('date', 'desc'), limit(3));
-        const postsSnapshot = await getDocs(postsQuery);
-        setRecentPosts(postsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[]);
+        const { data: posts } = await supabase.from('posts').select('*').order('date', { ascending: false }).limit(3);
+        setRecentPosts(posts as BlogPost[]);
 
-        const vlogsQuery = query(collection(db, 'vlogs'), limit(3));
-        const vlogsSnapshot = await getDocs(vlogsQuery);
-        setFeaturedVlogs(vlogsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Vlog[]);
+        const { data: vlogs } = await supabase.from('vlogs').select('*').limit(3);
+        setFeaturedVlogs(vlogs as Vlog[]);
 
-        const photosQuery = query(collection(db, 'photography'), limit(6));
-        const photosSnapshot = await getDocs(photosQuery);
-        setPhotoGallery(photosSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Photography[]);
+        const { data: photos } = await supabase.from('photography').select('*').limit(6);
+        setPhotoGallery(photos as Photography[]);
     };
     fetchData();
   }, []);

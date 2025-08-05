@@ -12,8 +12,7 @@ import { MoreHorizontal, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { BlogPost } from '@/lib/data';
 import { Spinner } from '@/components/ui/spinner';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function AdminDashboardPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -23,15 +22,14 @@ export default function AdminDashboardPage() {
   async function fetchPosts() {
     setLoading(true);
     try {
-      const postsCollection = collection(db, 'posts');
-      const postsSnapshot = await getDocs(postsCollection);
-      const postsList = postsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[];
-      setPosts(postsList);
-    } catch (error) {
+      const { data, error } = await supabase.from('posts').select('*').order('date', { ascending: false });
+      if (error) throw error;
+      setPosts(data as BlogPost[]);
+    } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not fetch blog posts.',
+        description: 'Could not fetch blog posts: ' + error.message,
       });
     } finally {
       setLoading(false);
@@ -46,17 +44,22 @@ export default function AdminDashboardPage() {
     if (!confirm('Are you sure you want to delete this post?')) return;
 
     try {
-      await deleteDoc(doc(db, 'posts', id));
+      const response = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete post');
+      }
+      
       toast({
         title: 'Success',
         description: 'Post deleted successfully.',
       });
       fetchPosts(); // Refresh posts list
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not delete the post.',
+        description: error.message,
       });
     }
   };

@@ -11,9 +11,8 @@ import { MoreHorizontal, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { Photography } from '@/lib/data';
 import Image from 'next/image';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { Spinner } from '@/components/ui/spinner';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function AdminPhotographyPage() {
   const [photos, setPhotos] = useState<Photography[]>([]);
@@ -23,15 +22,14 @@ export default function AdminPhotographyPage() {
   async function fetchPhotos() {
     setLoading(true);
     try {
-      const photosCollection = collection(db, 'photography');
-      const photosSnapshot = await getDocs(photosCollection);
-      const photosList = photosSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Photography[];
-      setPhotos(photosList);
-    } catch (error) {
+      const { data, error } = await supabase.from('photography').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      setPhotos(data as Photography[]);
+    } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not fetch photos.',
+        description: 'Could not fetch photos: ' + error.message,
       });
     } finally {
       setLoading(false);
@@ -40,23 +38,27 @@ export default function AdminPhotographyPage() {
 
   useEffect(() => {
     fetchPhotos();
-  }, [toast]);
+  }, []);
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this photo?')) return;
 
     try {
-      await deleteDoc(doc(db, 'photography', id));
+      const response = await fetch(`/api/photography/${id}`, { method: 'DELETE' });
+       if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete photo');
+      }
       toast({
         title: 'Success',
         description: 'Photo deleted successfully.',
       });
       fetchPhotos(); // Refresh photo list
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not delete the photo.',
+        description: error.message,
       });
     }
   };

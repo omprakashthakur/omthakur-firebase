@@ -9,8 +9,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Download, X } from 'lucide-react';
 import Link from 'next/link';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function PhotographyPage() {
   const [photos, setPhotos] = useState<Photography[]>([]);
@@ -18,10 +17,8 @@ export default function PhotographyPage() {
 
   useEffect(() => {
     const fetchPhotos = async () => {
-        const photosCollection = collection(db, 'photography');
-        const photosSnapshot = await getDocs(photosCollection);
-        const photoData = photosSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Photography[];
-        setPhotos(photoData);
+        const { data } = await supabase.from('photography').select('*').order('created_at', { ascending: false });
+        setPhotos(data as Photography[]);
     }
     fetchPhotos();
   }, []);

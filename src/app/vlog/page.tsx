@@ -9,8 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PlayCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { supabase } from '@/lib/supabaseClient';
 
 const platforms = vlogPlatforms;
 const categories = vlogCategories;
@@ -20,10 +19,8 @@ export default function VlogPage() {
 
   useEffect(() => {
     const fetchVlogs = async () => {
-        const vlogsCollection = collection(db, 'vlogs');
-        const vlogsSnapshot = await getDocs(vlogsCollection);
-        const vlogData = vlogsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Vlog[];
-        setVlogs(vlogData);
+        const { data } = await supabase.from('vlogs').select('*').order('created_at', { ascending: false });
+        setVlogs(data as Vlog[]);
     };
     fetchVlogs();
   }, []);

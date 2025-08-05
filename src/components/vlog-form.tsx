@@ -20,8 +20,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { vlogCategories, vlogPlatforms } from '@/lib/data';
 import type { Vlog } from '@/lib/data';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
 
 
@@ -61,11 +59,20 @@ export default function VlogForm({ vlog }: VlogFormProps) {
     };
     
     try {
-        if(isEditing) {
-            const vlogRef = doc(db, 'vlogs', vlog.id);
-            await updateDoc(vlogRef, finalValues);
-        } else {
-            await addDoc(collection(db, 'vlogs'), finalValues);
+        const method = isEditing ? 'PUT' : 'POST';
+        const url = isEditing ? `/api/vlogs/${vlog.id}` : '/api/vlogs';
+
+        const response = await fetch(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(finalValues)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Something went wrong');
         }
 
       toast({

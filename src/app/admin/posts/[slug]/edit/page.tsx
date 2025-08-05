@@ -5,27 +5,35 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import PostForm from '@/components/post-form';
 import type { BlogPost } from '@/lib/data';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { Spinner } from '@/components/ui/spinner';
+import { supabase } from '@/lib/supabaseClient';
 
 
 export default function EditPostPage() {
   const params = useParams();
-  const id = params.slug as string; // The slug is now the Firestore document ID
+  const id = params.slug as string;
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (id) {
         const fetchPost = async () => {
-            const postDoc = await getDoc(doc(db, 'posts', id));
-            if (postDoc.exists()) {
-                setPost({ ...postDoc.data(), id: postDoc.id } as BlogPost);
+            const { data, error } = await supabase
+                .from('posts')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error) {
+                console.error('Error fetching post:', error);
+                setLoading(false);
+                return;
             }
+            
+            setPost(data as BlogPost);
             setLoading(false);
         }
-        fetchPost().catch(() => setLoading(false));
+        fetchPost();
     }
   }, [id]);
 
