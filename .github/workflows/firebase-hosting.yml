@@ -1,3 +1,4 @@
+
 # This file is a template, and might need editing to fit your project.
 #
 # This workflow is triggered on pushes to the repository. It builds the
@@ -34,11 +35,10 @@ jobs:
         with:
           node-version: 20
       - run: npm install
+      - run: npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_OMTHAKURIO }}'
           projectId: '${{ secrets.GCP_PROJECT_ID }}'
           channelId: live
-        env:
-          FIREBASE_CLI_EXPERIMENTS: webframeworks

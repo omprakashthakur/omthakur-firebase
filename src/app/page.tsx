@@ -1,4 +1,6 @@
 
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, PlayCircle } from "lucide-react";
@@ -13,35 +15,26 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { collection, getDocs, limit, query } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-
-async function getRecentPosts() {
-    const postsCollection = collection(db, 'posts');
-    const q = query(postsCollection, limit(3));
-    const postsSnapshot = await getDocs(q);
-    return postsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[];
-}
-
-async function getFeaturedVlogs() {
-    const vlogsCollection = collection(db, 'vlogs');
-    const q = query(vlogsCollection, limit(3));
-    const vlogsSnapshot = await getDocs(q);
-    return vlogsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Vlog[];
-}
-
-async function getPhotoGallery() {
-    const photosCollection = collection(db, 'photography');
-    const q = query(photosCollection, limit(6));
-    const photosSnapshot = await getDocs(q);
-    return photosSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Photography[];
-}
+import { useEffect, useState } from "react";
+import { getPosts, getVlogs, getPhotos } from "@/lib/supabaseClient";
 
 
-export default async function Home() {
-  const recentPosts = await getRecentPosts();
-  const featuredVlogs = await getFeaturedVlogs();
-  const photoGallery = await getPhotoGallery();
+export default function Home() {
+  const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
+  const [featuredVlogs, setFeaturedVlogs] = useState<Vlog[]>([]);
+  const [photoGallery, setPhotoGallery] = useState<Photography[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+        const posts = await getPosts();
+        setRecentPosts(posts.slice(0, 3));
+        const vlogs = await getVlogs();
+        setFeaturedVlogs(vlogs.slice(0, 3));
+        const photos = await getPhotos();
+        setPhotoGallery(photos.slice(0, 6));
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="flex flex-col">

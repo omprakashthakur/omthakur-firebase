@@ -9,21 +9,19 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Download, X } from 'lucide-react';
 import Link from 'next/link';
+import { getPhotos } from '@/lib/supabaseClient';
 
-// NOTE: This page remains a client component because the image modal 
-// functionality requires client-side state (useState).
-// The data fetching is still optimized to happen once on component mount.
 
 export default function PhotographyPage() {
   const [photos, setPhotos] = useState<Photography[]>([]);
   const [selectedImage, setSelectedImage] = useState<Photography | null>(null);
 
   useEffect(() => {
-    // This fetch now happens on the client, but the page can be made faster
-    // by passing server-fetched data as an initial prop if needed.
-    fetch('/api/photography')
-      .then(res => res.json())
-      .then(setPhotos);
+    const fetchPhotos = async () => {
+        const photoData = await getPhotos();
+        setPhotos(photoData);
+    }
+    fetchPhotos();
   }, []);
 
   return (

@@ -1,4 +1,6 @@
 
+"use client";
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { type Vlog, vlogCategories, vlogPlatforms } from '@/lib/data';
@@ -6,20 +8,23 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PlayCircle } from 'lucide-react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { useEffect, useState } from 'react';
+import { getVlogs } from '@/lib/supabaseClient';
+
 
 const platforms = vlogPlatforms;
 const categories = vlogCategories;
 
-async function getVlogs() {
-    const vlogsCollection = collection(db, 'vlogs');
-    const vlogsSnapshot = await getDocs(vlogsCollection);
-    return vlogsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Vlog[];
-}
+export default function VlogPage() {
+  const [vlogs, setVlogs] = useState<Vlog[]>([]);
 
-export default async function VlogPage() {
-  const vlogs = await getVlogs();
+  useEffect(() => {
+    const fetchVlogs = async () => {
+        const vlogData = await getVlogs();
+        setVlogs(vlogData);
+    };
+    fetchVlogs();
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-16">

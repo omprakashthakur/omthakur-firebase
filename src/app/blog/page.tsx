@@ -1,4 +1,6 @@
 
+"use client";
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,40 +9,34 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Calendar, User } from 'lucide-react';
 import type { BlogPost } from '@/lib/data';
 import BlogSidebar from '@/components/blog-sidebar';
-import { collection, getDocs, query, where, limit } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { categories, allTags } from '@/lib/data';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { getPosts } from '@/lib/supabaseClient';
 
 const POSTS_PER_PAGE = 6;
 
-async function getPosts() {
-    const postsCollection = collection(db, 'posts');
-    const postsSnapshot = await getDocs(postsCollection);
-    return postsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[];
-}
-
-async function getRecentPosts() {
-    const postsCollection = collection(db, 'posts');
-    const q = query(postsCollection, limit(5));
-    const postsSnapshot = await getDocs(q);
-    return postsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as BlogPost[];
-}
-
-export default async function BlogPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  const posts = await getPosts();
-  const recentPosts = await getRecentPosts();
-
-  const currentPage = Number(searchParams['page']) || 1;
-  const selectedCategory = searchParams['category'] as string | undefined;
-  const selectedTag = searchParams['tag'] as string | undefined;
+export default function BlogPage() {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
+  
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get('page')) || 1;
+  const selectedCategory = searchParams.get('category') as string | undefined;
+  const selectedTag = searchParams.get('tag') as string | undefined;
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      const allPosts = await getPosts();
+      setPosts(allPosts);
+      setRecentPosts(allPosts.slice(0, 5));
+    }
+    fetchData();
+  }, []);
 
   const filteredPosts = posts
     .filter(post => !selectedCategory || post.category === selectedCategory)
-    .filter(post => !selectedTag || post.tags.includes(selectedTag));
+    .filter(post => !selectedTag || (post.tags && post.tags.includes(selectedTag)));
   
   const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
   const paginatedPosts = filteredPosts.slice(
