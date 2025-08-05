@@ -48,4 +48,6 @@ export async function DELETE(
     return NextResponse.json({ message: 'Post deleted successfully' });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    
+    return NextResponse.json({ message: 'Error deleting post', error: errorMessage }, { status: 500 });
+  }
+}
