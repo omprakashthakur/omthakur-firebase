@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -21,6 +20,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { vlogCategories, vlogPlatforms } from '@/lib/data';
 import type { Vlog } from '@/lib/data';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
+import { Loader2 } from 'lucide-react';
+
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
@@ -47,22 +50,23 @@ export default function VlogForm({ vlog }: VlogFormProps) {
       category: vlog?.category,
     },
   });
+  
+  const { isSubmitting } = form.formState;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const method = isEditing ? 'PUT' : 'POST';
-    const url = isEditing ? `/api/vlogs/${vlog.id}` : '/api/vlogs';
+    
+    const finalValues = {
+        ...values,
+        thumbnail: `https://placehold.co/600x400.png?text=${encodeURIComponent(values.title)}`
+    };
     
     try {
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Something went wrong');
-      }
+        if(isEditing) {
+            const vlogRef = doc(db, 'vlogs', vlog.id);
+            await updateDoc(vlogRef, finalValues);
+        } else {
+            await addDoc(collection(db, 'vlogs'), finalValues);
+        }
 
       toast({
         title: `Vlog ${isEditing ? 'updated' : 'created'}`,
@@ -158,7 +162,10 @@ export default function VlogForm({ vlog }: VlogFormProps) {
                 )}
               />
              </div>
-            <Button type="submit">{isEditing ? 'Update Vlog' : 'Create Vlog'}</Button>
+            <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isEditing ? 'Update Vlog' : 'Create Vlog'}
+            </Button>
           </form>
         </Form>
       </CardContent>

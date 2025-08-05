@@ -18,6 +18,9 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import type { Photography } from '@/lib/data';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
+import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   src: z.string().url('Please enter a valid image URL.'),
@@ -43,20 +46,15 @@ export default function PhotographyForm({ photo }: PhotographyFormProps) {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const method = isEditing ? 'PUT' : 'POST';
-    const url = isEditing ? `/api/photography/${photo.id}` : '/api/photography';
-    
-    try {
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
+  const { isSubmitting } = form.formState;
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Something went wrong');
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      if (isEditing) {
+        const photoRef = doc(db, 'photography', photo.id);
+        await updateDoc(photoRef, values);
+      } else {
+        await addDoc(collection(db, 'photography'), values);
       }
 
       toast({
@@ -120,7 +118,10 @@ export default function PhotographyForm({ photo }: PhotographyFormProps) {
                 </FormItem>
               )}
             />
-            <Button type="submit">{isEditing ? 'Update Photo' : 'Add Photo'}</Button>
+            <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isEditing ? 'Update Photo' : 'Add Photo'}
+            </Button>
           </form>
         </Form>
       </CardContent>
