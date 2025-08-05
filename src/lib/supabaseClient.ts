@@ -1,5 +1,5 @@
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { BlogPost, Vlog, Photography } from '@/lib/data';
 
 // IMPORTANT: These are placeholder values.
@@ -7,15 +7,19 @@ import type { BlogPost, Vlog, Photography } from '@/lib/data';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'YOUR_SUPABASE_URL';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
 
-if (supabaseUrl === 'YOUR_SUPABASE_URL' || supabaseAnonKey === 'YOUR_SUPABASE_ANON_KEY') {
-    console.warn('Supabase credentials are not set. Please update your environment variables.');
+let supabase: SupabaseClient | null = null;
+
+if (supabaseUrl !== 'YOUR_SUPABASE_URL' && supabaseAnonKey !== 'YOUR_SUPABASE_ANON_KEY') {
+  supabase = createClient(supabaseUrl, supabaseAnonKey);
+} else {
+  console.warn('Supabase credentials are not set. Please update your environment variables. App will run with empty data.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Helper functions to fetch data
 
 export const getPosts = async (): Promise<BlogPost[]> => {
+    if (!supabase) return [];
     const { data, error } = await supabase.from('posts').select('*');
     if (error) {
         console.error('Error fetching posts:', error);
@@ -25,6 +29,7 @@ export const getPosts = async (): Promise<BlogPost[]> => {
 };
 
 export const getPost = async (slug: string): Promise<BlogPost | null> => {
+    if (!supabase) return null;
     const { data, error } = await supabase.from('posts').select('*').eq('slug', slug).single();
     if (error) {
         console.error(`Error fetching post with slug ${slug}:`, error);
@@ -34,6 +39,7 @@ export const getPost = async (slug: string): Promise<BlogPost | null> => {
 }
 
 export const getVlogs = async (): Promise<Vlog[]> => {
+    if (!supabase) return [];
     const { data, error } = await supabase.from('vlogs').select('*');
     if (error) {
         console.error('Error fetching vlogs:', error);
@@ -43,6 +49,7 @@ export const getVlogs = async (): Promise<Vlog[]> => {
 }
 
 export const getPhotos = async (): Promise<Photography[]> => {
+    if (!supabase) return [];
     const { data, error } = await supabase.from('photography').select('*');
     if (error) {
         console.error('Error fetching photos:', error);
