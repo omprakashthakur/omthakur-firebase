@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 import { collection, getDocs, addDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
     
     const newVlog = {
         ...vlogData,
-        thumbnail: 'https://placehold.co/600x400.png', // Placeholder
+        thumbnail: `https://placehold.co/600x400.png?text=${encodeURIComponent(vlogData.title)}`, // Placeholder
     };
 
     const docRef = await addDoc(collection(db, 'vlogs'), newVlog);
