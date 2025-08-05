@@ -1,10 +1,19 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
 
-export async function GET(request: Request, { params }: { params: { slug: string } }) {
+export async function GET(
+  request: Request, 
+  { params }: { params: { slug: string } }
+) {
   try {
-    const { slug } = params;
-    const { data, error } = await supabase.from('posts').select('*').eq('id', slug).single();
+    const slug = params.slug;
+    
+    // Use maybeSingle() to handle cases where the slug doesn't exist
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('slug', slug)
+      .maybeSingle();
 
     if (error) {
       throw new Error(error.message);
@@ -21,9 +30,12 @@ export async function GET(request: Request, { params }: { params: { slug: string
   }
 }
 
-export async function PUT(request: Request, { params }: { params: { slug: string } }) {
+export async function PUT(
+  request: Request, 
+  { params }: { params: { slug: string } }
+) {
   try {
-    const { slug } = params;
+    const slug = await Promise.resolve(params.slug);
     const body = await request.json();
     const { data, error } = await supabase.from('posts').update(body).eq('id', slug).select();
 
@@ -38,9 +50,12 @@ export async function PUT(request: Request, { params }: { params: { slug: string
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { slug: string } }) {
+export async function DELETE(
+  request: Request, 
+  { params }: { params: { slug: string } }
+) {
   try {
-    const { slug } = params;
+    const slug = await Promise.resolve(params.slug);
     const { error } = await supabase.from('posts').delete().eq('id', slug).select();
 
     if (error) {

@@ -21,13 +21,18 @@ import { useToast } from '@/hooks/use-toast';
 import { vlogCategories, vlogPlatforms } from '@/lib/data';
 import type { Vlog } from '@/lib/data';
 import { Loader2 } from 'lucide-react';
+import { getYouTubeThumbnail, extractYouTubeVideoId } from '@/lib/youtubeThumbnails';
 
+
+// Define the literals for enum values
+const platformValues = ['YouTube', 'Instagram', 'TikTok'] as const;
+const categoryValues = ['Travel', 'Tech Talks', 'Daily Life'] as const;
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
   url: z.string().url('Please enter a valid URL.'),
-  platform: z.enum(vlogPlatforms, { required_error: 'Please select a platform.' }),
-  category: z.enum(vlogCategories, { required_error: 'Please select a category.' }),
+  platform: z.enum(platformValues, { required_error: 'Please select a platform.' }),
+  category: z.enum(categoryValues, { required_error: 'Please select a category.' }),
 });
 
 interface VlogFormProps {
@@ -53,9 +58,20 @@ export default function VlogForm({ vlog }: VlogFormProps) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     
+    // Generate thumbnail URL based on platform
+    let thumbnailUrl = '';
+    
+    if (values.platform === 'YouTube') {
+      // Use our YouTube thumbnail utility to get a high-quality thumbnail
+      thumbnailUrl = getYouTubeThumbnail(values.url);
+    } else {
+      // Default placeholder for other platforms
+      thumbnailUrl = `https://placehold.co/600x400.png?text=${encodeURIComponent(values.title)}`;
+    }
+    
     const finalValues = {
         ...values,
-        thumbnail: `https://placehold.co/600x400.png?text=${encodeURIComponent(values.title)}`
+        thumbnail: thumbnailUrl
     };
     
     try {
