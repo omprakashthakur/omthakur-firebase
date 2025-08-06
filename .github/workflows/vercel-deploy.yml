@@ -37,6 +37,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           GENKIT_API_KEY: ${{ secrets.GENKIT_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
       
       # Deploy to Vercel using a simplified command
       - name: Deploy to Vercel
@@ -51,4 +52,5 @@ jobs:
             --build-env NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }} \
             --build-env NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }} \
             --build-env NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }} \
-            --build-env GENKIT_API_KEY=${{ secrets.GENKIT_API_KEY }}
+            --build-env GENKIT_API_KEY=${{ secrets.GENKIT_API_KEY }} \
+            --build-env PEXELS_API_KEY=${{ secrets.PEXELS_API_KEY }}
