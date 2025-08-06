@@ -23,12 +23,24 @@ CREATE TABLE posts (
 CREATE TABLE vlogs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
+    description TEXT,
     thumbnail VARCHAR(255),
     platform ENUM('YouTube', 'Instagram', 'TikTok') NOT NULL,
     url VARCHAR(255) NOT NULL,
-    category ENUM('Travel', 'Tech Talks', 'Daily Life') NOT NULL,
+    category ENUM('Travel', 'Tech', 'Food', 'Lifestyle', 'Education', 'Entertainment') NOT NULL,
+    -- YouTube-specific fields
+    youtube_video_id VARCHAR(50),
+    duration VARCHAR(20), -- ISO 8601 duration format (PT4M13S)
+    view_count INT,
+    tags TEXT, -- Comma-separated tags
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    -- Indexes for better performance
+    INDEX idx_platform (platform),
+    INDEX idx_category (category),
+    INDEX idx_youtube_video_id (youtube_video_id),
+    INDEX idx_created_at (created_at)
 );
 
 -- Photography Table

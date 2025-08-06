@@ -2,7 +2,6 @@
   "name": "nextn",
   "version": "0.1.0",
   "private": true,
-
   "scripts": {
     "dev": "next dev --turbopack -p 8000",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
@@ -16,7 +15,9 @@
     "firebase:deploy:static": "npm run build:static && firebase deploy --only hosting",
     "check:deployment": "./scripts/check-deployment.sh",
     "vercel:deploy": "vercel deploy --prod",
-    "sync:pexels": "node scripts/syncPexelsPhotos.mjs"
+    "sync:pexels": "node scripts/syncPexelsPhotos.mjs",
+    "sync:youtube": "./scripts/sync-youtube-videos.sh",
+    "setup:youtube": "./scripts/setup-youtube-api.sh"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.14.1",
@@ -51,6 +52,7 @@
     "embla-carousel-react": "^8.6.0",
     "firebase": "^11.9.1",
     "genkit": "^1.14.1",
+    "googleapis": "^155.0.0",
     "lucide-react": "^0.475.0",
     "next": "15.3.3",
     "next-themes": "^0.3.0",

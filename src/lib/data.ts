@@ -15,11 +15,17 @@ export interface BlogPost {
 export interface Vlog {
   id: string | number; // ID can be string (Firestore) or number (Supabase)
   title: string;
+  description?: string;
   thumbnail: string;
   platform: 'YouTube' | 'Instagram' | 'TikTok';
   url: string;
-  category: 'Travel' | 'Tech Talks' | 'Daily Life';
+  category: 'Travel' | 'Tech Talks' | 'Daily Life' | 'Food' | 'Lifestyle' | 'Education' | 'Entertainment';
   created_at?: string; // Optional for backwards compatibility
+  // YouTube-specific fields
+  youtube_video_id?: string;
+  duration?: string; // ISO 8601 duration format (PT4M13S)
+  view_count?: number;
+  tags?: string; // Comma-separated tags
 }
 
 export interface Photography {
@@ -42,7 +48,15 @@ export interface Photography {
 }
 
 export const categories = ['Tech', 'Current Affairs', 'Personal'];
-export const vlogCategories: Vlog['category'][] = ['Travel', 'Tech Talks', 'Daily Life'];
+export const vlogCategories = [
+  'All',
+  'Travel', 
+  'Food', 
+  'Tech', 
+  'Daily',
+  'Education',
+  'Entertainment'
+] as const;
 export const vlogPlatforms: Vlog['platform'][] = ['YouTube', 'Instagram', 'TikTok'];
 
 // Mock data is no longer the source of truth, but can be useful for examples or fallbacks.

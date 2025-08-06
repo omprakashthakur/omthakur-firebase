@@ -37,12 +37,60 @@ function generatePlaceholderVlogs() {
   ];
 }
 
+/**
+ * Auto-sync YouTube videos if enabled and no recent sync has occurred
+ */
+async function autoSyncYouTube() {
+  try {
+    // Only auto-sync if YouTube credentials are configured
+    if (!process.env.YOUTUBE_API_KEY || !process.env.YOUTUBE_CHANNEL_ID) {
+      return false;
+    }
+
+    // Check when last sync occurred (you could store this in database)
+    // For now, we'll do a simple check for recent YouTube videos
+    const { data: recentYouTubeVlogs } = await supabase
+      .from('vlogs')
+      .select('created_at')
+      .eq('platform', 'YouTube')
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    const lastSync = recentYouTubeVlogs?.[0]?.created_at;
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+    // Only auto-sync if no YouTube videos exist or last video is older than 1 day
+    if (!lastSync || lastSync < oneDayAgo) {
+      const syncResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8000'}/api/youtube/sync?maxResults=5`, {
+        method: 'GET'
+      });
+
+      if (syncResponse.ok) {
+        const syncResult = await syncResponse.json();
+        console.log('Auto-sync completed:', syncResult);
+        return true;
+      }
+    }
+
+    return false;
+  } catch (error) {
+    console.error('Auto-sync failed:', error);
+    return false;
+  }
+}
+
 export async function GET(request: Request) {
   try {
     // Get the search params from the request URL
     const { searchParams } = new URL(request.url);
     const order = searchParams.get('order');
+    const autoSync = searchParams.get('autoSync') !== 'false'; // Default to true
     
+    // Attempt auto-sync if enabled
+    if (autoSync) {
+      await autoSyncYouTube();
+    }
+
     // Build the query
     let query = supabase.from('vlogs').select('*');
     
