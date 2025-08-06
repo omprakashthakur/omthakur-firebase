@@ -36,11 +36,14 @@ export default function PhotographyPage() {
         const regularData = await regularResponse.json();
         
         if (Array.isArray(regularData)) {
-          // Add source indicator
+          // Add source indicator and handle missing fields
           const personalPhotos = regularData.map(photo => ({
             ...photo,
             source: 'personal',
-            category: 'personal'
+            category: 'personal',
+            title: photo.title || 'Photography Work',
+            description: photo.description || photo.alt || 'Professional photography',
+            tags: photo.tags || []
           }));
           allPhotos = [...allPhotos, ...personalPhotos];
         }
@@ -68,10 +71,10 @@ export default function PhotographyPage() {
         errorMessages.push('Could not load Pexels collection photos');
       }
       
-      // Sort by creation date (newest first)
+      // Sort by creation date (newest first) or by ID if no date
       allPhotos.sort((a, b) => {
-        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : Number(a.id || 0);
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : Number(b.id || 0);
         return dateB - dateA;
       });
       
@@ -82,7 +85,7 @@ export default function PhotographyPage() {
       setPhotos(paginatedPhotos);
       setTotalPhotos(allPhotos.length);
       
-      // Only set error if both APIs failed and we have no photos
+      // Only set error if both APIs failed and we have no photos from either source
       if (errorMessages.length > 0 && allPhotos.length === 0) {
         setError(errorMessages.join('. '));
       } else {
@@ -209,10 +212,13 @@ export default function PhotographyPage() {
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.onerror = null;
-                      target.src = generatePlaceholderImage(400, 400, 'Image Unavailable');
+                      // Use the public placeholder image as fallback
+                      target.src = '/placeholder-image.jpg';
                     }}
                   />
                   
@@ -325,7 +331,7 @@ export default function PhotographyPage() {
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
-                  target.src = generatePlaceholderImage(1600, 1200, 'High Resolution Image Unavailable');
+                  target.src = '/placeholder-image.jpg';
                 }}
               />
               
