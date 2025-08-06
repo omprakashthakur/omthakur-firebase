@@ -207,19 +207,20 @@ export default function PhotographyPage() {
               <Card key={photo.id || index} className="group overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer">
                 <CardContent className="p-0 relative aspect-square">
                   <Image
-                    src={photo.src}
-                    alt={photo.alt}
+                    src={photo.src || '/placeholder-image.jpg'}
+                    alt={photo.alt || 'Photography image'}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                     placeholder="blur"
-                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                    blurDataURL={photo.blurDataURL || "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.onerror = null;
-                      // Use the public placeholder image as fallback
+                      target.onerror = null; // Prevent infinite error loops
                       target.src = '/placeholder-image.jpg';
                     }}
+                    loading="lazy"
+                    fetchPriority="auto"
                   />
                   
                   {/* Overlay with actions */}
@@ -321,16 +322,18 @@ export default function PhotographyPage() {
           {selectedImage && (
             <div className="relative bg-black rounded-lg overflow-hidden">
               <Image
-                src={selectedImage.downloadUrl || selectedImage.src} // Use high resolution version
-                alt={selectedImage.alt}
+                src={selectedImage.downloadUrl || selectedImage.src || '/placeholder-image.jpg'} // Use high resolution version
+                alt={selectedImage.alt || 'Photography image'}
                 width={1600}
                 height={1200}
                 className="w-full h-auto max-h-[85vh] object-contain"
                 priority
                 quality={100} // Maximum quality
+                placeholder="blur"
+                blurDataURL={selectedImage.blurDataURL || "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.onerror = null;
+                  target.onerror = null; // Prevent infinite error loops
                   target.src = '/placeholder-image.jpg';
                 }}
               />

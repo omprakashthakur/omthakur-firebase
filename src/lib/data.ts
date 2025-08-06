@@ -47,6 +47,9 @@ export interface Photography {
   originalUrl?: string; // Link to original photo on Pexels
   width?: number;
   height?: number;
+  // Next.js Image component optimizations
+  blurDataURL?: string; // Base64 data URL for the blur placeholder
+  placeholder?: 'blur' | 'empty'; // Type of placeholder to use
 }
 
 export const categories = ['Tech', 'Current Affairs', 'Personal'];
