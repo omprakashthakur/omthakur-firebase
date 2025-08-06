@@ -101,7 +101,7 @@ function getCuratedPhotographyFallback() {
       photographer_url: 'https://omthakur.site',
       width: 1260,
       height: 750,
-      download_url: 'https://images.pexels.com/photos/1366919/pexels-photo-1366919.jpeg',
+      downloadUrl: 'https://images.pexels.com/photos/1366919/pexels-photo-1366919.jpeg',
       created_at: new Date().toISOString()
     },
     {
@@ -116,7 +116,7 @@ function getCuratedPhotographyFallback() {
       photographer_url: 'https://omthakur.site',
       width: 1260,
       height: 750,
-      download_url: 'https://images.pexels.com/photos/2681319/pexels-photo-2681319.jpeg',
+      downloadUrl: 'https://images.pexels.com/photos/2681319/pexels-photo-2681319.jpeg',
       created_at: new Date().toISOString()
     },
     {
@@ -131,7 +131,7 @@ function getCuratedPhotographyFallback() {
       photographer_url: 'https://omthakur.site',
       width: 1260,
       height: 750,
-      download_url: 'https://images.pexels.com/photos/1179229/pexels-photo-1179229.jpeg',
+      downloadUrl: 'https://images.pexels.com/photos/1179229/pexels-photo-1179229.jpeg',
       created_at: new Date().toISOString()
     },
     {
@@ -146,7 +146,7 @@ function getCuratedPhotographyFallback() {
       photographer_url: 'https://omthakur.site',
       width: 1260,
       height: 750,
-      download_url: 'https://images.pexels.com/photos/1496372/pexels-photo-1496372.jpeg',
+      downloadUrl: 'https://images.pexels.com/photos/1496372/pexels-photo-1496372.jpeg',
       created_at: new Date().toISOString()
     },
     {
@@ -161,7 +161,7 @@ function getCuratedPhotographyFallback() {
       photographer_url: 'https://omthakur.site',
       width: 1260,
       height: 750,
-      download_url: 'https://images.pexels.com/photos/1173777/pexels-photo-1173777.jpeg',
+      downloadUrl: 'https://images.pexels.com/photos/1173777/pexels-photo-1173777.jpeg',
       created_at: new Date().toISOString()
     },
     {
@@ -176,7 +176,7 @@ function getCuratedPhotographyFallback() {
       photographer_url: 'https://omthakur.site',
       width: 1260,
       height: 750,
-      download_url: 'https://images.pexels.com/photos/1804911/pexels-photo-1804911.jpeg',
+      downloadUrl: 'https://images.pexels.com/photos/1804911/pexels-photo-1804911.jpeg',
       created_at: new Date().toISOString()
     },
     {
@@ -191,7 +191,7 @@ function getCuratedPhotographyFallback() {
       photographer_url: 'https://omthakur.site',
       width: 1260,
       height: 750,
-      download_url: 'https://images.pexels.com/photos/2116721/pexels-photo-2116721.jpeg',
+      downloadUrl: 'https://images.pexels.com/photos/2116721/pexels-photo-2116721.jpeg',
       created_at: new Date().toISOString()
     },
     {
@@ -206,7 +206,7 @@ function getCuratedPhotographyFallback() {
       photographer_url: 'https://omthakur.site',
       width: 1260,
       height: 750,
-      download_url: 'https://images.pexels.com/photos/1450361/pexels-photo-1450361.jpeg',
+      downloadUrl: 'https://images.pexels.com/photos/1450361/pexels-photo-1450361.jpeg',
       created_at: new Date().toISOString()
     }
   ];
@@ -215,15 +215,19 @@ function getCuratedPhotographyFallback() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { data, error } = await supabase.from('photography').insert([body]).select();
+    const { data, error } = await supabase
+      .from('photography')
+      .insert([body])
+      .select();
 
     if (error) {
-      throw new Error(error.message);
+      console.error('Error adding photo:', error);
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    return NextResponse.json(data, { status: 201 });
+    return NextResponse.json(data[0]);
   } catch (error) {
-     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ message: 'Error adding photo', error: errorMessage }, { status: 500 });
+    console.error('Error adding photo:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
