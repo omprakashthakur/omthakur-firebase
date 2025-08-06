@@ -2,6 +2,30 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
 import { fetchOmPrakashPhotos, formatPexelsPhotos } from '@/lib/pexelsClient';
 
+/**
+ * Format database photos to match the expected schema
+ */
+function formatDatabasePhotos(dbPhotos: any[]) {
+  return dbPhotos.map(photo => ({
+    id: `db-${photo.id}`,
+    title: photo.alt || 'Photography',
+    description: `Professional photography by Om Prakash Thakur`,
+    src: photo.src,
+    alt: photo.alt || 'Photography image',
+    category: 'personal',
+    tags: ['photography', 'om-prakash-thakur'],
+    photographerName: 'Om Prakash Thakur',
+    photographerUrl: 'https://omthakur.site',
+    width: 800,
+    height: 600,
+    originalUrl: photo.downloadUrl || photo.src,
+    downloadUrl: photo.downloadUrl || photo.downloadurl || photo.src,
+    created_at: new Date().toISOString(),
+    blurDataURL: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
+    placeholder: 'blur'
+  }));
+}
+
 export async function GET() {
   try {
     console.log('📸 Fetching photography data from Om Prakash Thakur collection...');
@@ -14,11 +38,12 @@ export async function GET() {
       const { data: dbPhotos, error } = await supabase
         .from('photography')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('id', { ascending: false });
 
       if (!error && dbPhotos && dbPhotos.length > 0) {
         console.log(`✅ Found ${dbPhotos.length} photos in database`);
-        allPhotos = [...allPhotos, ...dbPhotos];
+        const formattedDbPhotos = formatDatabasePhotos(dbPhotos);
+        allPhotos = [...allPhotos, ...formattedDbPhotos];
         sources.push('database');
       } else {
         console.log('⚠️ No photos found in database, fetching from Pexels collection...');
@@ -42,21 +67,8 @@ export async function GET() {
       }
     } catch (pexelsError) {
       console.error('❌ Error fetching from Pexels:', pexelsError);
-      // If Pexels API fails, return an error instead of dummy data
-      return NextResponse.json(
-        { 
-          error: 'Unable to fetch photography data. Please ensure PEXELS_API_KEY is configured.',
-          message: 'Photography collection unavailable'
-        }, 
-        { 
-          status: 503,
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'X-Photo-Sources': 'error',
-            'X-Photo-Count': '0'
-          }
-        }
-      );
+      // Continue with database photos if available
+      console.log('⚠️ Pexels API failed, but continuing with database photos if available...');
     }
 
     // Remove duplicates based on ID
