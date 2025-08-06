@@ -1,0 +1,61 @@
+name: Sync Pexels Photos
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: 'Force sync all photos'
+        required: false
+        default: 'false'
+        type: boolean
+  
+  # Scheduled sync (daily at 12:00 UTC)
+  schedule:
+    - cron: '0 12 * * *'
+  
+  # Trigger when photos are added to collection (webhook alternative)
+  repository_dispatch:
+    types: [sync-pexels-photos]
+
+jobs:
+  sync-photos:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Create .env.local file
+        run: |
+          echo "PEXELS_API_KEY=${{ secrets.PEXELS_API_KEY }}" >> .env.local
+          echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" >> .env.local
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> .env.local
+      
+      - name: Sync photos from Pexels collection
+        run: node scripts/sync-pexels-to-db.js
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      
+      - name: Notify completion
+        if: success()
+        run: |
+          echo "✅ Photo sync completed successfully!"
+          echo "🌐 New photos should now be available at https://omthakur.site/photography"
+      
+      - name: Handle sync failure
+        if: failure()
+        run: |
+          echo "❌ Photo sync failed. Check logs for details."
+          exit 1
