@@ -14,6 +14,7 @@ import type { Vlog } from '@/lib/data';
 import Image from 'next/image';
 import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/lib/supabaseClient';
+import { getYouTubeThumbnail } from '@/lib/youtubeThumbnails';
 
 
 export default function AdminVlogsPage() {
@@ -42,7 +43,7 @@ export default function AdminVlogsPage() {
     fetchVlogs();
   }, []);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string | number) => {
     if (!confirm('Are you sure you want to delete this vlog?')) return;
 
     try {
@@ -100,7 +101,24 @@ export default function AdminVlogsPage() {
               {vlogs.map((vlog) => (
                 <TableRow key={vlog.id}>
                   <TableCell>
-                    <Image src={vlog.thumbnail} alt={vlog.title} width={80} height={45} className="rounded-md object-cover" />
+                    <div className="relative w-[80px] h-[45px] rounded-md overflow-hidden">
+                      <Image 
+                        src={
+                          vlog.platform === 'YouTube' && vlog.url
+                            ? getYouTubeThumbnail(vlog.url)
+                            : (vlog.thumbnail || "https://placehold.co/800x450")
+                        } 
+                        alt={vlog.title} 
+                        width={80} 
+                        height={45} 
+                        className="object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.onerror = null; // Prevent infinite loop
+                          target.src = '/placeholder-image.jpg';
+                        }}
+                      />
+                    </div>
                   </TableCell>
                   <TableCell className="font-medium">{vlog.title}</TableCell>
                   <TableCell>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from 'next/image';
@@ -9,19 +8,40 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PlayCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { getYouTubeThumbnail } from '@/lib/youtubeThumbnails';
 
 const platforms = vlogPlatforms;
 const categories = vlogCategories;
 
 export default function VlogPage() {
   const [vlogs, setVlogs] = useState<Vlog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchVlogs = async () => {
-        const { data } = await supabase.from('vlogs').select('*').order('created_at', { ascending: false });
-        setVlogs(data as Vlog[]);
+      try {
+        setLoading(true);
+        // Use the API endpoint instead of direct Supabase access
+        // Removed the order parameter to avoid potential issues
+        const response = await fetch('/api/vlogs');
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(`Failed to fetch vlogs: ${response.status}${errorData.error ? ` - ${errorData.error}` : ''}`);
+        }
+        
+        const data = await response.json();
+        setVlogs(Array.isArray(data) ? data : []);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching vlogs:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load vlogs');
+      } finally {
+        setLoading(false);
+      }
     };
+    
     fetchVlogs();
   }, []);
 
@@ -32,55 +52,100 @@ export default function VlogPage() {
         <p className="text-xl text-muted-foreground">Stories and experiences, shared through video.</p>
       </header>
       
-      <Tabs defaultValue="YouTube" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 md:w-1/2 mx-auto">
-          {platforms.map(platform => (
-            <TabsTrigger key={platform} value={platform}>{platform}</TabsTrigger>
-          ))}
-        </TabsList>
+      {loading && (
+        <div className="flex justify-center items-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      )}
 
-        {platforms.map(platform => {
-          const platformVlogs = vlogs.filter(vlog => vlog.platform === platform);
-          return (
-            <TabsContent key={platform} value={platform}>
-              <div className="mt-12">
-                {categories.map(category => {
-                  const categoryVlogs = platformVlogs.filter(vlog => vlog.category === category);
-                  if (categoryVlogs.length === 0) return null;
-                  return (
-                    <section key={category} className="mb-12">
-                      <h2 className="text-3xl font-headline font-semibold mb-6">{category}</h2>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {categoryVlogs.map(vlog => (
-                          <Card key={vlog.id} className="group overflow-hidden shadow-lg relative">
-                            <Link href={vlog.url} target="_blank" rel="noopener noreferrer" className="block">
-                              <Image
-                                src={vlog.thumbnail}
-                                alt={vlog.title}
-                                width={600}
-                                height={400}
-                                className="w-full h-60 object-cover transition-transform duration-300 group-hover:scale-105"
-                                data-ai-hint="travel vlog"
-                              />
-                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <PlayCircle className="h-16 w-16 text-white" />
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 p-4 rounded-md mb-8">
+          <p>Error: {error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-2 px-4 py-2 bg-red-100 dark:bg-red-800 rounded-md hover:bg-red-200 dark:hover:bg-red-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      )}
+      
+      {!loading && !error && vlogs.length === 0 && (
+        <div className="text-center py-20">
+          <p className="text-xl text-muted-foreground mb-4">No vlogs found</p>
+          <p className="text-muted-foreground">Check back later for new content</p>
+        </div>
+      )}
+      
+      {!loading && !error && vlogs.length > 0 && (
+        <Tabs defaultValue={platforms[0]} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 md:w-1/2 mx-auto">
+            {platforms.map(platform => (
+              <TabsTrigger key={platform} value={platform}>{platform}</TabsTrigger>
+            ))}
+          </TabsList>
+
+          {platforms.map(platform => {
+            const platformVlogs = vlogs.filter(vlog => vlog.platform === platform);
+            return (
+              <TabsContent key={platform} value={platform}>
+                <div className="mt-12">
+                  {categories.map(category => {
+                    const categoryVlogs = platformVlogs.filter(vlog => vlog.category === category);
+                    if (categoryVlogs.length === 0) return null;
+                    return (
+                      <section key={category} className="mb-12">
+                        <h2 className="text-3xl font-headline font-semibold mb-6">{category}</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                          {categoryVlogs.map(vlog => (
+                            <Card key={vlog.id} className="group overflow-hidden shadow-lg relative">
+                              <Link href={vlog.url} target="_blank" rel="noopener noreferrer">
+                                <div className="relative aspect-video">
+                                  <Image
+                                    src={
+                                      vlog.platform === 'YouTube' && vlog.url
+                                        ? getYouTubeThumbnail(vlog.url)
+                                        : (vlog.thumbnail || "https://placehold.co/800x450")
+                                    }
+                                    alt={vlog.title}
+                                    className="object-cover"
+                                    fill
+                                    priority
+                                    onError={(e) => {
+                                      // Fallback to a local placeholder if image fails to load
+                                      const target = e.target as HTMLImageElement;
+                                      target.onerror = null; // Prevent infinite loop
+                                      
+                                      // For YouTube, try a lower quality thumbnail before giving up
+                                      if (vlog.platform === 'YouTube' && vlog.url && target.src.includes('maxresdefault')) {
+                                        target.src = vlog.url.replace('maxresdefault.jpg', 'hqdefault.jpg');
+                                      } else {
+                                        target.src = '/placeholder-image.jpg';
+                                        target.style.opacity = '0.7';
+                                      }
+                                    }}
+                                  />
+                                </div>
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                  <PlayCircle className="h-16 w-16 text-white" />
+                                </div>
+                              </Link>
+                              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                                <h3 className="font-headline text-lg text-white">{vlog.title}</h3>
+                                <Badge variant="default" className="mt-1">{vlog.platform}</Badge>
                               </div>
-                            </Link>
-                            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-                              <h3 className="font-headline text-lg text-white">{vlog.title}</h3>
-                              <Badge variant="default" className="mt-1">{vlog.platform}</Badge>
-                            </div>
-                          </Card>
-                        ))}
-                      </div>
-                    </section>
-                  );
-                })}
-              </div>
-            </TabsContent>
-          )
-        })}
-      </Tabs>
+                            </Card>
+                          ))}
+                        </div>
+                      </section>
+                    );
+                  })}
+                </div>
+              </TabsContent>
+            );
+          })}
+        </Tabs>
+      )}
     </div>
   );
 }

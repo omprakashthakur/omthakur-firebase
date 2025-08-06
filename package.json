@@ -3,13 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack -p 9002",
+    "dev": "next dev --turbopack -p 8000",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
     "build": "next build",
+    "build:static": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "firebase:deploy": "firebase deploy --only hosting",
+    "firebase:deploy:static": "npm run build:static && firebase deploy --only hosting",
+    "check:deployment": "./scripts/check-deployment.sh",
+    "vercel:deploy": "vercel deploy --prod"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.14.1",

@@ -1,0 +1,40 @@
+name: Vercel Integration
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Firebase Hosting (Static Only)"]
+    types:
+      - completed
+
+jobs:
+  notify_vercel:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    env:
+      VERCEL_PROJECT_ID: prj_MG7wWVlmNL1uJ8C63f07xh3U4xjb
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Optional: Install Vercel CLI to perform advanced operations
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Notify Vercel about Firebase deployment
+        run: |
+          echo "Notifying Vercel about Firebase deployment"
+          echo "Firebase URL: https://${{ secrets.GCP_PROJECT_ID }}.web.app"
+          echo "Vercel Project ID: ${{ env.VERCEL_PROJECT_ID }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Run ID: ${{ github.run_id }}"
+          
+          # Create a deployment comment for cross-platform visibility
+          echo "🔄 Deployed to Firebase: https://${{ secrets.GCP_PROJECT_ID }}.web.app" >> $GITHUB_STEP_SUMMARY
+          echo "📱 Vercel Project ID: ${{ env.VERCEL_PROJECT_ID }}" >> $GITHUB_STEP_SUMMARY
+          echo "📊 GitHub Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY

@@ -13,12 +13,13 @@ export interface BlogPost {
 }
 
 export interface Vlog {
-  id: string; // Firestore document ID
+  id: string | number; // ID can be string (Firestore) or number (Supabase)
   title: string;
   thumbnail: string;
   platform: 'YouTube' | 'Instagram' | 'TikTok';
   url: string;
   category: 'Travel' | 'Tech Talks' | 'Daily Life';
+  created_at?: string; // Optional for backwards compatibility
 }
 
 export interface Photography {
