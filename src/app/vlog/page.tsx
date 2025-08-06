@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PlayCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getYouTubeThumbnail } from '@/lib/youtubeThumbnails';
+import { generatePlaceholderImage } from '@/lib/utils';
 
 const platforms = vlogPlatforms;
 const categories = vlogCategories;
@@ -24,19 +25,40 @@ export default function VlogPage() {
         setLoading(true);
         // Use the API endpoint instead of direct Supabase access
         // Removed the order parameter to avoid potential issues
-        const response = await fetch('/api/vlogs');
+        const response = await fetch('/api/vlogs', {
+          // Add cache: 'no-store' to prevent caching issues during development
+          cache: 'no-store',
+          // Set a timeout to prevent hanging requests
+          signal: AbortSignal.timeout(8000)
+        });
+        
+        // Get response data whether or not the response is ok
+        // Our API now returns placeholder data instead of errors
+        const data = await response.json().catch(error => {
+          console.error('Error parsing JSON:', error);
+          return []; // Return empty array if JSON parsing fails
+        });
         
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(`Failed to fetch vlogs: ${response.status}${errorData.error ? ` - ${errorData.error}` : ''}`);
+          console.warn(`Server returned ${response.status} but we'll use the data anyway`);
         }
         
-        const data = await response.json();
+        // Ensure we always have an array to work with
         setVlogs(Array.isArray(data) ? data : []);
-        setError(null);
+        
+        // Only set error if we have no data to display
+        if (!Array.isArray(data) || data.length === 0) {
+          setError('No vlogs available at this time');
+        } else {
+          setError(null);
+        }
       } catch (err) {
         console.error('Error fetching vlogs:', err);
         setError(err instanceof Error ? err.message : 'Failed to load vlogs');
+        // Don't clear the vlogs array if we already have data
+        if (vlogs.length === 0) {
+          setVlogs([]);
+        }
       } finally {
         setLoading(false);
       }
@@ -120,8 +142,8 @@ export default function VlogPage() {
                                       if (vlog.platform === 'YouTube' && vlog.url && target.src.includes('maxresdefault')) {
                                         target.src = vlog.url.replace('maxresdefault.jpg', 'hqdefault.jpg');
                                       } else {
-                                        target.src = '/placeholder-image.jpg';
-                                        target.style.opacity = '0.7';
+                                        target.src = generatePlaceholderImage(800, 450, `${vlog.platform} - ${vlog.title}`, '#1a1a1a', '#ffffff');
+                                        target.style.opacity = '0.9';
                                       }
                                     }}
                                   />

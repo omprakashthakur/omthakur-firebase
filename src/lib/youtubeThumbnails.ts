@@ -51,7 +51,7 @@ export function getYouTubeThumbnail(
   
   // If we couldn't extract a video ID, return a placeholder
   if (!videoId) {
-    return 'https://placehold.co/800x450?text=Invalid+YouTube+URL';
+    return generatePlaceholderImage(800, 450, 'Invalid YouTube URL', '#1a1a1a', '#ff0000');
   }
   
   // Return the appropriate thumbnail URL
@@ -68,7 +68,7 @@ export function getYouTubeThumbnailOptions(videoIdOrUrl: string): string[] {
   const videoId = extractYouTubeVideoId(videoIdOrUrl);
   
   if (!videoId) {
-    return ['https://placehold.co/800x450?text=Invalid+YouTube+URL'];
+    return [generatePlaceholderImage(800, 450, 'Invalid YouTube URL', '#1a1a1a', '#ff0000')];
   }
   
   return [
@@ -79,8 +79,4 @@ export function getYouTubeThumbnailOptions(videoIdOrUrl: string): string[] {
   ];
 }
 
-export default {
-  extractYouTubeVideoId,
-  getYouTubeThumbnail,
-  getYouTubeThumbnailOptions
-};
+import { generatePlaceholderImage } from './utils';

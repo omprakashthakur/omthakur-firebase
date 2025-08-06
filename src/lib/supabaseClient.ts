@@ -24,22 +24,34 @@ function createMockClient() {
   const mockData = {
     vlogs: [
       { 
-        id: 1, 
-        title: 'Sample Vlog 1', 
+        id: 'mock-1', 
+        title: 'Mock Travel Vlog from Tokyo', 
         platform: 'YouTube', 
         category: 'Travel',
-        thumbnail: 'https://via.placeholder.com/400x300?text=Sample+Vlog+1',
-        url: 'https://youtube.com',
-        created_at: new Date().toISOString() 
+        thumbnail: 'https://images.pexels.com/photos/2506923/pexels-photo-2506923.jpeg',
+        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        created_at: new Date().toISOString(),
+        description: 'Exploring the vibrant streets of Tokyo and its unique culture'
       },
       { 
-        id: 2, 
-        title: 'Sample Vlog 2', 
-        platform: 'Instagram', 
+        id: 'mock-2', 
+        title: 'Italian Pasta Recipe', 
+        platform: 'YouTube', 
         category: 'Food',
-        thumbnail: 'https://via.placeholder.com/400x300?text=Sample+Vlog+2',
-        url: 'https://instagram.com',
-        created_at: new Date().toISOString() 
+        thumbnail: 'https://images.pexels.com/photos/1527603/pexels-photo-1527603.jpeg',
+        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        created_at: new Date(Date.now() - 86400000).toISOString(),
+        description: 'Learn how to make authentic Italian pasta from scratch'
+      },
+      { 
+        id: 'mock-3', 
+        title: 'Daily Morning Routine', 
+        platform: 'Instagram', 
+        category: 'Lifestyle',
+        thumbnail: 'https://images.pexels.com/photos/3155666/pexels-photo-3155666.jpeg',
+        url: 'https://www.instagram.com/',
+        created_at: new Date(Date.now() - 172800000).toISOString(),
+        description: 'My healthy morning routine to start the day right'
       }
     ],
     posts: [

@@ -23,10 +23,22 @@ export interface Vlog {
 }
 
 export interface Photography {
-  id: string; // Firestore document ID
+  id: string | number; // Firestore ID, Supabase ID, or "pexels-{id}"
   src: string;
   alt: string;
-  downloadUrl: string;
+  title?: string;
+  description?: string;
+  downloadUrl?: string;
+  category?: string;
+  tags?: string[];
+  created_at?: string;
+  source?: 'personal' | 'pexels' | string; // Source of the photo
+  // Fields for Pexels photos
+  photographerName?: string;
+  photographerUrl?: string;
+  originalUrl?: string; // Link to original photo on Pexels
+  width?: number;
+  height?: number;
 }
 
 export const categories = ['Tech', 'Current Affairs', 'Personal'];

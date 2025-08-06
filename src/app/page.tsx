@@ -26,15 +26,51 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-        const { data: posts } = await supabase.from('posts').select('*').order('date', { ascending: false }).limit(3);
-        setRecentPosts(posts as BlogPost[]);
+      try {
+        // Fetch blog posts
+        const { data: posts, error: postsError } = await supabase
+          .from('posts')
+          .select('*')
+          .order('date', { ascending: false })
+          .limit(3);
+        
+        if (postsError) {
+          console.error('Error fetching posts:', postsError);
+        } else {
+          console.log('Posts fetched successfully:', posts);
+          setRecentPosts(posts || []);
+        }
 
-        const { data: vlogs } = await supabase.from('vlogs').select('*').limit(3);
-        setFeaturedVlogs(vlogs as Vlog[]);
+        // Fetch vlogs
+        const { data: vlogs, error: vlogsError } = await supabase
+          .from('vlogs')
+          .select('*')
+          .limit(3);
+        
+        if (vlogsError) {
+          console.error('Error fetching vlogs:', vlogsError);
+        } else {
+          console.log('Vlogs fetched successfully:', vlogs);
+          setFeaturedVlogs(vlogs || []);
+        }
 
-        const { data: photos } = await supabase.from('photography').select('*').limit(6);
-        setPhotoGallery(photos as Photography[]);
+        // Fetch photos
+        const { data: photos, error: photosError } = await supabase
+          .from('photography')
+          .select('*')
+          .limit(6);
+        
+        if (photosError) {
+          console.error('Error fetching photos:', photosError);
+        } else {
+          console.log('Photos fetched successfully:', photos);
+          setPhotoGallery(photos || []);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     };
+    
     fetchData();
   }, []);
 
@@ -92,7 +128,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-headline font-bold text-center mb-12">Recent Blog Posts</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {recentPosts.map((post) => (
+            {recentPosts && recentPosts.length > 0 ? recentPosts.map((post) => (
               <Card key={post.slug} className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <Link href={`/blog/${post.slug}`} className="block relative h-48">
                   <Image
@@ -119,7 +155,11 @@ export default function Home() {
                   </Button>
                 </CardFooter>
               </Card>
-            ))}
+            )) : (
+              <div className="col-span-1 md:col-span-3 text-center py-8">
+                <p className="text-muted-foreground">No blog posts found. Check back soon!</p>
+              </div>
+            )}
           </div>
           <div className="text-center mt-12">
             <Button asChild variant="outline">
@@ -134,7 +174,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-headline font-bold text-center mb-12">Featured Vlogs</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredVlogs.map((vlog) => (
+            {featuredVlogs && featuredVlogs.length > 0 ? featuredVlogs.map((vlog) => (
               <Card key={vlog.id} className="group overflow-hidden shadow-lg relative">
                 <Link href={vlog.url} target="_blank" rel="noopener noreferrer" className="block relative h-60">
                   <Image
@@ -154,7 +194,11 @@ export default function Home() {
                   <Badge variant="default" className="mt-1">{vlog.platform}</Badge>
                 </div>
               </Card>
-            ))}
+            )) : (
+              <div className="col-span-1 md:col-span-3 text-center py-8">
+                <p className="text-muted-foreground">No vlogs found. Check back soon!</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -171,7 +215,7 @@ export default function Home() {
               className="w-full"
             >
               <CarouselContent>
-                {photoGallery.map((photo, index) => (
+                {photoGallery && photoGallery.length > 0 ? photoGallery.map((photo, index) => (
                   <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
                     <div className="p-1">
                       <Card className="overflow-hidden">
@@ -190,7 +234,13 @@ export default function Home() {
                       </Card>
                     </div>
                   </CarouselItem>
-                ))}
+                )) : (
+                  <CarouselItem className="basis-full">
+                    <div className="p-4 text-center">
+                      <p className="text-muted-foreground">No photos found. Check back soon!</p>
+                    </div>
+                  </CarouselItem>
+                )}
               </CarouselContent>
               <CarouselPrevious />
               <CarouselNext />
