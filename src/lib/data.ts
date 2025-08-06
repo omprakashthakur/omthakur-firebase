@@ -19,7 +19,7 @@ export interface Vlog {
   thumbnail: string;
   platform: 'YouTube' | 'Instagram' | 'TikTok';
   url: string;
-  category: 'Travel' | 'Tech Talks' | 'Daily Life' | 'Food' | 'Lifestyle' | 'Education' | 'Entertainment';
+  category: 'Travel' | 'Tech' | 'Daily' | 'Food' | 'Education' | 'Entertainment';
   created_at?: string; // Optional for backwards compatibility
   // YouTube-specific fields
   youtube_video_id?: string;
