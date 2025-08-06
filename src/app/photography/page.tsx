@@ -27,52 +27,33 @@ export default function PhotographyPage() {
     try {
       setLoading(true);
       
-      let allPhotos: Photography[] = [];
-      let errorMessages: string[] = [];
+      // Fetch photos from the main photography API (which includes both DB and Pexels collection)
+      const response = await fetch('/api/photography');
       
-      // Fetch your personal photos from database
-      try {
-        const regularResponse = await fetch('/api/photography');
-        const regularData = await regularResponse.json();
-        
-        if (Array.isArray(regularData)) {
-          // Add source indicator and handle missing fields
-          const personalPhotos = regularData.map(photo => ({
-            ...photo,
-            source: 'personal',
-            category: 'personal',
-            title: photo.title || 'Photography Work',
-            description: photo.description || photo.alt || 'Professional photography',
-            tags: photo.tags || []
-          }));
-          allPhotos = [...allPhotos, ...personalPhotos];
-        }
-      } catch (err) {
-        console.error('Error fetching personal photos:', err);
-        errorMessages.push('Could not load personal photos');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch photos: ${response.status}`);
       }
       
-      // Fetch photos from your Pexels collection
-      try {
-        const pexelsResponse = await fetch('/api/pexels');
-        const pexelsData = await pexelsResponse.json();
-        
-        if (Array.isArray(pexelsData)) {
-          // These are from your Pexels collection
-          const collectionPhotos = pexelsData.map((photo: any) => ({
-            ...photo,
-            source: 'pexels-collection',
-            category: 'pexels-collection'
-          }));
-          allPhotos = [...allPhotos, ...collectionPhotos];
-        }
-      } catch (err) {
-        console.error('Error fetching Pexels collection photos:', err);
-        errorMessages.push('Could not load Pexels collection photos');
+      const data = await response.json();
+      
+      // Check if the response is an error object
+      if (data.error) {
+        setError(data.message || 'Unable to load photography collection');
+        setPhotos([]);
+        setTotalPhotos(0);
+        return;
       }
       
-      // Sort by creation date (newest first) or by ID if no date
-      allPhotos.sort((a, b) => {
+      // Check if we have valid photo data
+      if (!Array.isArray(data) || data.length === 0) {
+        setError('No photos found in your collection. Please add photos to your Pexels collection or database.');
+        setPhotos([]);
+        setTotalPhotos(0);
+        return;
+      }
+      
+      // Sort by creation date (newest first)
+      const sortedPhotos = data.sort((a: Photography, b: Photography) => {
         const dateA = a.created_at ? new Date(a.created_at).getTime() : Number(a.id || 0);
         const dateB = b.created_at ? new Date(b.created_at).getTime() : Number(b.id || 0);
         return dateB - dateA;
@@ -80,20 +61,17 @@ export default function PhotographyPage() {
       
       // Implement pagination
       const startIndex = (page - 1) * photosPerPage;
-      const paginatedPhotos = allPhotos.slice(startIndex, startIndex + photosPerPage);
+      const paginatedPhotos = sortedPhotos.slice(startIndex, startIndex + photosPerPage);
       
       setPhotos(paginatedPhotos);
-      setTotalPhotos(allPhotos.length);
+      setTotalPhotos(sortedPhotos.length);
+      setError(null);
       
-      // Only set error if both APIs failed and we have no photos from either source
-      if (errorMessages.length > 0 && allPhotos.length === 0) {
-        setError(errorMessages.join('. '));
-      } else {
-        setError(null);
-      }
     } catch (error) {
       console.error('Error fetching photos:', error);
-      setError('Failed to load photos. Please try again later.');
+      setError('Failed to load photography collection. Please ensure your Pexels API key is configured correctly.');
+      setPhotos([]);
+      setTotalPhotos(0);
     } finally {
       setLoading(false);
     }
