@@ -41,7 +41,6 @@ jobs:
       - name: Deploy to Vercel
         run: |
           vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} \
-            --scope=team_7pU25BSgqyytT8OlaOpg4M6d \
             --confirm \
             --build-env NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }} \
             --build-env NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }} \
