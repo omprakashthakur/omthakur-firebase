@@ -98,12 +98,12 @@ export async function fetchYouTubeVideos(
           title: snippet.title || 'Untitled Video',
           description: snippet.description || '',
           publishedAt: snippet.publishedAt || new Date().toISOString(),
-          thumbnailUrl: snippet.thumbnails?.maxresdefault?.url || 
+          thumbnailUrl: (snippet.thumbnails as any)?.maxresdefault?.url || 
                        snippet.thumbnails?.high?.url || 
                        snippet.thumbnails?.medium?.url || 
                        snippet.thumbnails?.default?.url || '',
           url: `https://www.youtube.com/watch?v=${snippet.resourceId.videoId}`,
-          tags: snippet.tags || [],
+          tags: (snippet as any).tags || [],
         };
 
         videos.push(video);
@@ -139,34 +139,89 @@ export async function fetchYouTubeVideos(
 }
 
 /**
+ * Parse ISO 8601 duration to seconds
+ * @param duration ISO 8601 duration (e.g., "PT4M13S")
+ * @returns Duration in seconds
+ */
+function parseDuration(duration: string): number {
+  const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) return 0;
+  
+  const hours = parseInt(match[1] || '0');
+  const minutes = parseInt(match[2] || '0');
+  const seconds = parseInt(match[3] || '0');
+  
+  return hours * 3600 + minutes * 60 + seconds;
+}
+
+/**
+ * Determine if a YouTube video is a Short based on duration and content
+ * @param youTubeVideo YouTube video data
+ * @returns 'short' if it's a YouTube Short, 'long' otherwise
+ */
+export function getVideoType(youTubeVideo: YouTubeVideo): 'short' | 'long' {
+  // Check duration first (YouTube Shorts are max 60 seconds)
+  if (youTubeVideo.duration) {
+    const durationInSeconds = parseDuration(youTubeVideo.duration);
+    if (durationInSeconds <= 60) {
+      return 'short';
+    }
+  }
+  
+  // Check title and description for shorts indicators
+  const content = `${youTubeVideo.title} ${youTubeVideo.description}`.toLowerCase();
+  const shortsKeywords = ['#shorts', '#short', 'shorts', '#reel', '#reels'];
+  
+  if (shortsKeywords.some(keyword => content.includes(keyword))) {
+    return 'short';
+  }
+  
+  return 'long';
+}
+
+/**
+ * Determine the correct platform based on video type
+ * @param youTubeVideo YouTube video data
+ * @returns Platform type
+ */
+export function normalizePlatform(youTubeVideo: YouTubeVideo): Vlog['platform'] {
+  const videoType = getVideoType(youTubeVideo);
+  return videoType === 'short' ? 'YT Shorts' : 'YouTube';
+}
+
+/**
  * Convert YouTube video data to Vlog format for database storage
  * @param youTubeVideo YouTube video data
- * @param category Category to assign to the vlog (default: 'Lifestyle')
+ * @param category Category to assign to the vlog (default: 'Daily')
  * @returns Vlog object ready for database insertion
  */
 export function convertYouTubeVideoToVlog(
   youTubeVideo: YouTubeVideo,
-  category: string = 'Lifestyle'
+  category: string = 'Daily'
 ): Omit<Vlog, 'id'> {
   // Map new categories to existing ones for compatibility
   const categoryMapping: { [key: string]: string } = {
     'Tech': 'Tech',
     'Travel': 'Travel',
-    'Food': 'Lifestyle',
-    'Lifestyle': 'Lifestyle',
-    'Education': 'Tech', // Map to closest existing category
-    'Entertainment': 'Lifestyle'
+    'Food': 'Food',
+    'Daily': 'Daily',
+    'Lifestyle': 'Daily',
+    'Education': 'Education',
+    'Entertainment': 'Entertainment'
   };
 
-  const mappedCategory = categoryMapping[category] || 'Lifestyle';
+  const mappedCategory = categoryMapping[category] || 'Daily';
+  const videoType = getVideoType(youTubeVideo);
+  const platform = normalizePlatform(youTubeVideo);
 
   return {
     title: youTubeVideo.title,
     description: youTubeVideo.description,
-    platform: 'YouTube',
+    platform: platform,
     category: mappedCategory as any,
     thumbnail: youTubeVideo.thumbnailUrl,
     url: youTubeVideo.url,
+    video_type: videoType,
     created_at: youTubeVideo.publishedAt,
     youtube_video_id: youTubeVideo.id,
     duration: youTubeVideo.duration,

@@ -17,9 +17,11 @@ export interface Vlog {
   title: string;
   description?: string;
   thumbnail: string;
-  platform: 'YouTube' | 'Instagram' | 'TikTok';
+  platform: 'YouTube' | 'YT Shorts' | 'Instagram Reels' | 'TikTok';
   url: string;
   category: 'Travel' | 'Tech' | 'Daily' | 'Food' | 'Education' | 'Entertainment';
+  video_type?: 'long' | 'short'; // New field for video length type
+  featured?: boolean; // New field for featured videos
   created_at?: string; // Optional for backwards compatibility
   // YouTube-specific fields
   youtube_video_id?: string;
@@ -57,7 +59,7 @@ export const vlogCategories = [
   'Education',
   'Entertainment'
 ] as const;
-export const vlogPlatforms: Vlog['platform'][] = ['YouTube', 'Instagram', 'TikTok'];
+export const vlogPlatforms: Vlog['platform'][] = ['YouTube', 'YT Shorts', 'Instagram Reels', 'TikTok'];
 
 // Mock data is no longer the source of truth, but can be useful for examples or fallbacks.
 // Keeping tag list for now for filter UI.

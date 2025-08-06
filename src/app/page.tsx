@@ -41,17 +41,29 @@ export default function Home() {
           setRecentPosts(posts || []);
         }
 
-        // Fetch vlogs
+        // Fetch vlogs - only long format videos for featured section
         const { data: vlogs, error: vlogsError } = await supabase
           .from('vlogs')
           .select('*')
+          .neq('platform', 'YT Shorts') // Exclude YouTube Shorts
           .limit(3);
         
         if (vlogsError) {
           console.error('Error fetching vlogs:', vlogsError);
         } else {
-          console.log('Vlogs fetched successfully:', vlogs);
-          setFeaturedVlogs(vlogs || []);
+          // Additional client-side filtering for videos that might be shorts based on title
+          const longVideos = vlogs?.filter((vlog: Vlog) => {
+            const title = vlog.title.toLowerCase();
+            const isShort = title.includes('#shorts') || 
+                          title.includes('#short') || 
+                          title.includes('shorts') || 
+                          title.includes('#reel') || 
+                          title.includes('#reels');
+            return !isShort; // Only include non-short videos
+          }) || [];
+          
+          console.log('Long vlogs fetched successfully:', longVideos);
+          setFeaturedVlogs(longVideos);
         }
 
         // Fetch photos
