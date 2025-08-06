@@ -278,3 +278,4 @@ If you don't need server-side features on Firebase, you can use the static-only 
 
 ## License
 MIT
+# Photography API Fix
