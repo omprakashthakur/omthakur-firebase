@@ -38,6 +38,8 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           GENKIT_API_KEY: ${{ secrets.GENKIT_API_KEY }}
       
+      # Deploys the application to Vercel using the Project ID and Token from GitHub Secrets
+      # This deployment uses the personal Vercel account (not team/org based deployment)
       - name: Deploy to Vercel
         run: |
           vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} \
