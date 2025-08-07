@@ -11,7 +11,7 @@ interface ShareButtonsProps {
 
 export default function ShareButtons({ url, title }: ShareButtonsProps) {
   const { toast } = useToast();
-  const fullUrl = `https://omthakur.io${url}`;
+  const fullUrl = `https://omthakur.site${url}`;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(fullUrl);

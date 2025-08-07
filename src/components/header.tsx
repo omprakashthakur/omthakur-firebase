@@ -104,7 +104,6 @@ export default function Header() {
               <Link href="https://www.instagram.com/omthakur_official" aria-label="Instagram" target="_blank" rel="noopener"><SocialIcons.Instagram className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
               <Link href="https://twitter.com/mr_omthakur" aria-label="Twitter" target="_blank" rel="noopener"><SocialIcons.Twitter className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
               <Link href="https://www.youtube.com/@omthakurofficial" aria-label="YouTube" target="_blank" rel="noopener"><SocialIcons.Youtube className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-              <Link href="https://www.tiktok.com/@omthakur_official" aria-label="TikTok" target="_blank" rel="noopener"><SocialIcons.TikTok className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
             </div>
             <Button
                 variant="ghost"

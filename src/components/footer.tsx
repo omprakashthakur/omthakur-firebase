@@ -36,7 +36,6 @@ export default function Footer() {
                           <Link href="https://www.youtube.com/@omthakurofficial" aria-label="YouTube" target="_blank" rel="noopener"><div className="w-8 h-8 rounded-md bg-[#FF0000] flex items-center justify-center"><SocialIcons.Youtube className="text-white h-5 w-5"/></div></Link>
                           <Link href="https://github.com/omprakashthakur" aria-label="GitHub" target="_blank" rel="noopener"><div className="w-8 h-8 rounded-md bg-foreground flex items-center justify-center"><SocialIcons.Github className="text-background h-5 w-5"/></div></Link>
                           <Link href="https://twitter.com/mr_omthakur" aria-label="Twitter" target="_blank" rel="noopener"><div className="w-8 h-8 rounded-md bg-[#1DA1F2] flex items-center justify-center"><SocialIcons.Twitter className="text-white h-5 w-5"/></div></Link>
-                          <Link href="https://www.tiktok.com/@omthakur_official" aria-label="TikTok" target="_blank" rel="noopener"><div className="w-8 h-8 rounded-md bg-[#010101] flex items-center justify-center"><SocialIcons.TikTok className="text-white h-5 w-5"/></div></Link>
                         </div>
                     </div>
 
