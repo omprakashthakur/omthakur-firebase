@@ -73,7 +73,7 @@ export default function Footer() {
                 </div>
 
                 <div className="mt-8 border-t pt-6 text-center text-sm text-muted-foreground">
-                    <p>&copy; {new Date().getFullYear()} OmThakur.IO. All Rights Reserved.</p>
+                    <p>&copy; {new Date().getFullYear()} Om Thakur. All Rights Reserved.</p>
                 </div>
             </div>
         </footer>
