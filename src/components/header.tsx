@@ -62,7 +62,9 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">
-  
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4">
+          <Link href="/" className="text-xl font-headline font-bold">Om Thakur</Link>
+        </div>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
