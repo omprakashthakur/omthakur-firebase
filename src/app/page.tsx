@@ -107,7 +107,7 @@ export default function Home() {
             </div>
             <div className="relative h-64 md:h-auto md:aspect-[4/3] rounded-lg shadow-2xl overflow-hidden">
                 <Image
-                    src="https://placehold.co/800x600.png"
+                    src="https://images.pexels.com/photos/33059766/pexels-photo-33059766.png"
                     alt="Woman working on a computer"
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
