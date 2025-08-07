@@ -85,14 +85,14 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mt-24">
+      {/* <section className="mt-24">
         <h2 className="text-4xl font-headline font-bold text-center mb-12">Skills & Expertise</h2>
-        {/* <div className="flex flex-wrap justify-center gap-4">
+        <div className="flex flex-wrap justify-center gap-4">
           {skills.map(skill => (
             <Badge key={skill} variant="secondary" className="text-lg px-4 py-2">{skill}</Badge>
           ))}
-        </div> */}
-      </section>
+        </div>
+      </section> */}
     </div>
   );
 }
