@@ -62,22 +62,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4">
-          <Link href="/" className="text-xl font-headline font-bold">Om Thakur</Link>
-          <div className="flex flex-col md:flex-row md:items-center gap-2 text-xs text-muted-foreground">
-            <span className="hidden md:inline">Contact: <a href="tel:+9779801718546" className="hover:underline">+977 9801718546</a></span>
-            <span className="hidden md:inline">Email: <a href="mailto:omthakurofficial@gmail.com" className="hover:underline">omthakurofficial@gmail.com</a></span>
-            <div className="flex items-center gap-2">
-              <Link href="https://github.com/omprakashthakur" aria-label="Github" target="_blank" rel="noopener"><SocialIcons.Github className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-              <Link href="https://www.linkedin.com/in/omthakurofficial/" aria-label="Linkedin" target="_blank" rel="noopener"><SocialIcons.Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-              <Link href="https://www.facebook.com/omthakurofficial" aria-label="Facebook" target="_blank" rel="noopener"><SocialIcons.Facebook className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-              <Link href="https://www.instagram.com/omthakur_official" aria-label="Instagram" target="_blank" rel="noopener"><SocialIcons.Instagram className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-              <Link href="https://twitter.com/mr_omthakur" aria-label="Twitter" target="_blank" rel="noopener"><SocialIcons.Twitter className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-              <Link href="https://www.youtube.com/@omthakurofficial" aria-label="YouTube" target="_blank" rel="noopener"><SocialIcons.Youtube className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-              <Link href="https://www.tiktok.com/@omthakur_official" aria-label="TikTok" target="_blank" rel="noopener"><SocialIcons.TikTok className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-            </div>
-          </div>
-        </div>
+  
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
@@ -110,12 +95,14 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-            <div className="hidden md:flex items-center gap-4">
-                <Link href="#" aria-label="YouTube"><SocialIcons.Youtube className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-                <Link href="#" aria-label="Instagram"><SocialIcons.Instagram className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-                <Link href="#" aria-label="Facebook"><SocialIcons.Facebook className="h-5 w-5 text-muted-foreground hover:text-primary"/></Link>
-                <Link href="#" aria-label="Linkedin"><SocialIcons.Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary"/></Link>
-                <Link href="#" aria-label="Github"><SocialIcons.Github className="h-5 w-5 text-muted-foreground hover:text-primary"/></Link>
+            <div className="flex items-center gap-2">
+              <Link href="https://github.com/omprakashthakur" aria-label="Github" target="_blank" rel="noopener"><SocialIcons.Github className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+              <Link href="https://www.linkedin.com/in/omthakurofficial/" aria-label="Linkedin" target="_blank" rel="noopener"><SocialIcons.Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+              <Link href="https://www.facebook.com/omthakurofficial" aria-label="Facebook" target="_blank" rel="noopener"><SocialIcons.Facebook className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+              <Link href="https://www.instagram.com/omthakur_official" aria-label="Instagram" target="_blank" rel="noopener"><SocialIcons.Instagram className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+              <Link href="https://twitter.com/mr_omthakur" aria-label="Twitter" target="_blank" rel="noopener"><SocialIcons.Twitter className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+              <Link href="https://www.youtube.com/@omthakurofficial" aria-label="YouTube" target="_blank" rel="noopener"><SocialIcons.Youtube className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+              <Link href="https://www.tiktok.com/@omthakur_official" aria-label="TikTok" target="_blank" rel="noopener"><SocialIcons.TikTok className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
             </div>
             <Button
                 variant="ghost"
